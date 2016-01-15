@@ -2,7 +2,7 @@
 title: "Time Series Analysis of Fatal Police Shootings"
 author: "Brendan Graham"
 date: "January 15, 2016"
-output: word_document
+output: html_document
 ---
 ### Introduction
 
