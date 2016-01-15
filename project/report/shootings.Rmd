@@ -2,19 +2,19 @@
 title: "Time Series Analysis of Fatal Police Shootings"
 author: "Brendan Graham"
 date: "January 15, 2016"
-output: html_document
+output: word_document
 ---
 ### Introduction
 
 ### Data Description
 
-The fatal police shooting data is from an ongoing project developed by [The Washington Post](https://www.washingtonpost.com/graphics/national/police-shootings/), which has been keeping track of fatal police shootings using news reports, public records, Internet databases and original reporting. The database tracks shootings in which a police officer, while on duty, shot and killed a civilian and does not include deaths of people in custody, fatal shootings by off-duty officers or deaths in which police gunfire did not kill the individual. The Post’s database is updated regularly on their [GitHub page](https://github.com/washingtonpost/data-police-shootings) as new fatal shootings are reported and as new facts emerge about individual cases.In addition to the date and location of a fatal shooting, the database also tracks variables such as race, gender, age and signs of any mental illness exhibited by the victim. 
+The fatal police shooting data is from an ongoing project developed by [The Washington Post](https://www.washingtonpost.com/graphics/national/police-shootings/), which has been keeping track of fatal police shootings using news reports, public records, Internet databases and original reporting. The database tracks shootings in which a police officer, while on duty, shot and killed a civilian and does not include deaths of people in custody, fatal shootings by off-duty officers or deaths in which police gunfire did not kill the individual. The Post's database is updated regularly on their [GitHub page](https://github.com/washingtonpost/data-police-shootings) as new fatal shootings are reported and as new facts emerge about individual cases. In addition to the date and location of a fatal shooting, the database also tracks variables such as race, gender, age and signs of any mental illness exhibited by the victim. 
 
-The data consists of fatal police shootings in the U.S. between `r min(data$date)` and `r max(data$date)` and contains `r nrow(data)` observations of `r ncol(data)` variables. The initial data set contained `r nrow(data)` observations of 12 variables: ID, victim's name, date of the shooting, manner of death, what the victim was armed with (if anything), age, gender, race, city, state, if the victim showed signs of mental illness, and threat level at the time of the shooting. By definition, the data set did not include days where there were 0 fatal police shootings. To make the data complete, I filled in those date "gaps" so there would be an observation for every day, regardless of whether or not a fatal police shooting had occured. To account for this, I added a column called "count" (i.e. number of victims) which took on a value of either 1 or 0 for each observation, thus preserving the initial number of fatal police shootings.
+The data consists of fatal police shootings in the U.S. between `r min(data$date)` and `r max(data$date)` and contains `r nrow(data)` observations of `r ncol(data)` variables. The initial data set contained `r nrow(data)` observations of 12 variables: ID, victim's name, date of the shooting, manner of death, what the victim was armed with (if anything), age, gender, race, city, state, if the victim showed signs of mental illness, and threat level at the time of the shooting. By definition, the data set did not include days where there were 0 fatal police shootings. To make the data complete, I filled in those date "gaps" so there would be an observation for every day, regardless of whether or not a fatal police shooting had occured. To account for this, I added a column called "count" (i.e. the number of victims) which took on a value of either 1 or 0 for each observation, thus preserving the initial total number of fatal police shootings.
 
 I also added the following variables: year, month, day, number of victims,^[Each row consisted of only 1 or 0 victims, but adding this variable helped to aggregate the data for plotting purposes.] and current population estimate for each city in the data set^[This allowed me to compute fatal shootings by police per 100,000 residents for a better comparison among states]. I also grouped the race variable into `r nlevels(data$race2)` categories (`r levels(data$race2)`) and grouped age into `r nlevels(data$age2)` categories (`r levels(data$age2)`).
 
-Most fatal police shootings occured in `r city[1,1]` with `r city[1,2]` shootings, followed by `r city[2,1]` and `r city[3,1]`, each with`r city[3,2]` shootings. However, `r per.capita[1,1]`, `r per.capita[2,1]` and `r per.capita[3,1]` had the most fatal police shootings per 100,000 residents. Most victims of fatal police shootings were `r race[1,1]` (`r race[1,2]` `r race[1,1]` victims vs. `r race[2,2]` `r race[2,1]` victims) and between the age of `r age[1,1]`. Most victims were armed with `r armed[1,1]` at the time of the shooting and their threat level was reported as "`r threat.level[1,1]`".
+Most fatal police shootings occured in `r city[1,1]` with `r city[1,2]` shootings, followed by `r city[2,1]` and `r city[3,1]`, each with`r city[3,2]` shootings. However, `r per.capita[1,1]`, `r per.capita[2,1]` and `r per.capita[3,1]` had the most fatal police shootings per 100,000 residents. Most victims of fatal police shootings were `r race[1,1]` (`r race[1,2]` `r race[1,1]` victims vs. `r race[2,2]` `r race[2,1]` victims) and between the age of `r age[1,1]`. Most victims were armed with a `r armed[1,1]` at the time of the shooting and their threat level was reported as "`r threat.level[1,1]`".
 
 The monthly bar plot below shows peaks of fatal shootings in May, July and December 2015. Below that, the timeseries plot shows a fairly consistent spread around a mean of `r format(mean(date$total), digits=3)` fatal police shootings per day.
 
@@ -22,7 +22,7 @@ The monthly bar plot below shows peaks of fatal shootings in May, July and Decem
 print(month.plot)
 ```
 
-```{r, echo = FALSE, fig.width=15, fig.height=8}
+```{r, echo = FALSE, fig.width=17, fig.height=11}
 print(timeseries.plot)
 ```
 
