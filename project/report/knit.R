@@ -1,4 +1,4 @@
-source("pa_shootings.R")
+source("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/data/pa_shootings.R")
 library("rmarkdown")
-render('shootings.Rmd')
-rstudio::viewer("C:/Users/GRA/Desktop/Misc/R Working Directory/Other/NFL/nfl_team_stats/shootings.html")
+render("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/report/shootings.rmd")
+rstudio::viewer("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/report/shootings.html")
