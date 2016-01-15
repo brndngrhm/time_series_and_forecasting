@@ -17,12 +17,6 @@ library(grid)
 data <- read.csv("https://raw.githubusercontent.com/washingtonpost/data-police-shootings/master/fatal-police-shootings-data.csv")
 data$date <- ymd(data$date)
 data$age <- as.numeric(data$age)
-data$state.flag <- "other"
-data$state.flag[data$state == "PA"] <- "PA"
-data$state.flag <- as.factor(data$state.flag)
-data$city.flag <- "other"
-data$city.flag[data$city== "Philadelphia"] <- "PHL"
-data$city.flag <- as.factor(data$city.flag)
 data$month <- month(data$date, label = TRUE)
 data$year <- year(data$date)
 data$year <- as.factor(data$year)
@@ -47,8 +41,8 @@ data$age2[data$age == 0] <- "Unknown"
 data$age2 <- as.factor(data$age2)
 
 #loads and checks structure
-View(data)
-str(data)
+#View(data)
+#str(data)
 
 #state population data
 states <- read.csv("http://www.census.gov/popest/data/state/totals/2015/tables/NST-EST2015-01.csv", header = FALSE)
@@ -63,13 +57,13 @@ states$state <- as.factor(states$state)
 states$pop <- as.numeric(states$pop)
 
 #loads and checks structure
-View(states)
-str(states)
+#View(states)
+#str(states)
 
 #joins shooting and population data
 data <- left_join(data, states, by = "state")
 data$state <- as.factor(data$state)
-str(data)
+#str(data)
 
 #creates dataframe of list of dates to fill in date gaps
 date.ref <- data.frame(date=seq(as.Date("2015-01-01"), as.Date("2016-01-15"), by="days"))
@@ -80,7 +74,7 @@ data <- merge(data,date.ref,by.x='date',by.y='date',all.x=T,all.y=T)
 data$count[is.na(data$count)] <- 0
 
 #writes .csv file
-write.csv(data, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/data/shootings.csv")
+#write.csv(data, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/data/shootings.csv")
 
 #ggplot theme----
 
@@ -96,7 +90,7 @@ write.csv(data, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/tim
 "Garamond"
 
 #Global theme options - to easily all plots at once
-font.type <- "Verdana"
+font.type <- "Lucida Sans"
 background.color <- "#f1f1f1"
 line.color <- "#d8d8d8"
 title.color <- "#3C3C3C"
@@ -154,60 +148,61 @@ manner.of.death <- data %>% filter(count > 0) %>% group_by(manner_of_death) %>% 
 per.capita <- data %>% filter(count > 0) %>% select(state, count, pop) %>% group_by(state, pop) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total))
 per.capita$pop.thousands <- per.capita$pop/100000
 per.capita$per.cap.thousands <- per.capita$total/per.capita$pop.thousands
+per.capita <- per.capita %>%  arrange(desc(per.cap.thousands))
 
 (per.cap.plot <- ggplot(per.capita, aes(x=reorder(state, per.cap.thousands), y=per.cap.thousands, fill = race)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + labs(x="", y="Fatal Shootings by Police per 100,000 Residents") + coord_flip() + theme_bg)
 
-ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/per.cap.plot.png")
+#ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/per.cap.plot.png")
 
 
 (year.plot <- ggplot(year, aes(x=(reorder(year,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
   labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
-ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/year.plot.png", height=7, width=8)
+#ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/year.plot.png", height=7, width=8)
 
 
 (state.plot <- ggplot(state, aes(x=(reorder(state,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
   labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
-ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/state.plot.png", height=7, width=8)
+#ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/state.plot.png", height=7, width=8)
 
 
 (city.plot <- ggplot(city, aes(x=(reorder(city,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
   labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
-ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/city.plot.png", height=7, width=8)
+#ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/city.plot.png", height=7, width=8)
 
 
 (race.plot <- ggplot(race, aes(x=(reorder(race2,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
   labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
-ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/race.plot.png", height=7, width=8)
+#ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/race.plot.png", height=7, width=8)
 
 
 (age.plot <- ggplot(age, aes(x=(reorder(age2,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
   labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
-ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/age.plot.png", height=7, width=8)
+#ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/age.plot.png", height=7, width=8)
 
 
 (mental.illness.plot <- ggplot(mental.illness, aes(x=(reorder(signs_of_mental_illness,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
   labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
-ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/mental.illness.plot.png", height=7, width=8)
+#ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/mental.illness.plot.png", height=7, width=8)
 
 
 (armed.plot <- ggplot(armed, aes(x=(reorder(armed,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
   labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
-ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/armed.plot.png", height=7, width=8)
+#ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/armed.plot.png", height=7, width=8)
 
 
 
@@ -215,14 +210,14 @@ ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_for
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
   labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
-ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/threat.plot.png", height=7, width=8)
+#ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/threat.plot.png", height=7, width=8)
 
 
 (manner.plot <- ggplot(manner.of.death, aes(x=(reorder(manner_of_death,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
   labs(x="", y="Fatal hootings by Police") + coord_flip() + theme_bg)
 
-ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/manner.plot.png", height=7, width=8)
+#ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/manner.plot.png", height=7, width=8)
 
 
 #groups by date and makes date plot
@@ -233,16 +228,16 @@ month <- data %>% group_by(year, month, count) %>% summarise(total = sum(count))
   labs(x="", y="Fatal Shootings by Police") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)))
 
-ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/month.plot.png", height=7, width=8)
+#ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/month.plot.png", height=7, width=8)
 
 
 date <- data %>% group_by(date, count) %>% summarise(total = sum(count))
 
 (timeseries.plot <- ggplot(date, aes(x=date, y=total)) + 
-  geom_point(size=3) + geom_line(size=0.04) + 
+  geom_point() + geom_line(size=0.04) + 
   labs(x="", y="Fatal Shootings by Police") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
   scale_x_datetime(breaks = ("1 month")))
 
-ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/timeseries.plot.png", height=7, width=8)
+#ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/timeseries.plot.png", height=7, width=8)
 
