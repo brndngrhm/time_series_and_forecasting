@@ -96,7 +96,7 @@ line.color <- "#d8d8d8"
 title.color <- "#3C3C3C"
 title.size <- 22
 axis.color <- "#535353"
-axis.size <- 14
+axis.size <- 18
 
 transparency <- .7 #for alpha
 line.size <- 1.6 #for geom_line()
@@ -225,7 +225,7 @@ month <- data %>% group_by(year, month, count) %>% summarise(total = sum(count))
 
 (month.plot <- ggplot(subset(month, count > 0), aes(x=month, y=total)) + facet_grid(.~year)+ 
  geom_bar(stat="identity", alpha=transparency, fill = "dodgerblue") + 
-  labs(x="", y="Fatal Shootings by Police") + theme_bg + 
+  labs(x="", y="", title = "Fatal Shootings by Police per Month") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)))
 
 #ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/month.plot.png", height=7, width=8)
@@ -235,7 +235,7 @@ date <- data %>% group_by(date, count) %>% summarise(total = sum(count))
 
 (timeseries.plot <- ggplot(date, aes(x=date, y=total)) + 
   geom_point() + geom_line(size=0.04) + 
-  labs(x="", y="Fatal Shootings by Police") + theme_bg + 
+  labs(x="", y="", title = "Timeseries Plot of Fatal Shootings by Police") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
   scale_x_datetime(breaks = ("1 month")))
 
