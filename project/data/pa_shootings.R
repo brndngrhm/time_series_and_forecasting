@@ -68,7 +68,7 @@ data$state <- as.factor(data$state)
 #str(data)
 
 #creates dataframe of list of dates to fill in date gaps
-date.ref <- data.frame(date=seq(as.Date("2015-01-01"), as.Date("2016-01-15"), by="days"))
+date.ref <- data.frame(date=seq(as.Date("2015-01-01"), as.Date("2016-01-16"), by="days"))
 date.ref$date <- ymd(date.ref$date)
 
 #joins data and date.ref dataframes and replaces na with 0's
