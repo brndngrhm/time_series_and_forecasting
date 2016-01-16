@@ -14,7 +14,8 @@ library(grid)
 #loads and formats data----
 
 #shooting data
-data <- read.csv("https://raw.githubusercontent.com/washingtonpost/data-police-shootings/master/fatal-police-shootings-data.csv")
+x <- getURL("https://raw.githubusercontent.com/washingtonpost/data-police-shootings/master/fatal-police-shootings-data.csv")
+data <- read.csv(text = x)
 data$date <- ymd(data$date)
 data$age <- as.numeric(data$age)
 data$month <- month(data$date, label = TRUE)
@@ -45,8 +46,9 @@ data$age2 <- as.factor(data$age2)
 #str(data)
 
 #state population data
-states <- read.csv("http://www.census.gov/popest/data/state/totals/2015/tables/NST-EST2015-01.csv", header = FALSE)
-states <- states[-c(1, 2, 3, 4, 5, 6, 7, 8, 9, 61, 62, 63, 64, 65, 66, 67), -c(2,3,4,5,6,7,8)] #removes unwanted rows and columns, keeps only 2015 population and state name
+y <- getURL("http://www.census.gov/popest/data/state/totals/2015/tables/NST-EST2015-01.csv", header = FALSE)
+states <- read.csv(text = y)
+states <- states[-c(1, 2,3, 4, 5, 6, 7, 8, 9, 61, 62, 63, 64, 65, 66, 67), -c(2,3,4,5,6,7,8)] #removes unwanted rows and columns, keeps only 2015 population and state name
 names(states)[1] <- "state"
 names(states)[2] <- "pop"
 states$state <- sub('.', '', states$state) #removes "." at beginning of state names
@@ -234,7 +236,7 @@ month <- data %>% group_by(year, month, count) %>% summarise(total = sum(count))
 date <- data %>% group_by(date, count) %>% summarise(total = sum(count))
 
 (timeseries.plot <- ggplot(date, aes(x=date, y=total)) + 
-  geom_point() + geom_line(size=0.04) + 
+  geom_point() + geom_line() + 
   labs(x="", y="", title = "Timeseries Plot of Fatal Shootings by Police") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
   scale_x_datetime(breaks = ("1 month")))
