@@ -60,3 +60,12 @@ print(month.plot)
 print(timeseries.plot)
 ```
 
+A plot of the auto correlation function (ACF) shows not much seasonality in the data. Almost every line is contained within the blue dashed lines, other than the the line at a lag of 0, which is expected^[The blue dahsed lines indicate a 95% confidence interval if the data were IID, that is, ACF lines within the blue lines are indistinguishible from IID noise.]
+
+```{r, echo=FALSE,fig.width=17, fig.height=11, results = "asis"}
+
+print(acf.plot)
+
+```
+
+
