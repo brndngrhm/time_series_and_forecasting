@@ -230,6 +230,7 @@ month <- data %>% group_by(year, month, count) %>% summarise(total = sum(count))
   labs(x="", y="", title = "Fatal Shootings by Police per Month") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)))
 
+
 #ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/month.plot.png", height=7, width=8)
 
 
@@ -243,3 +244,7 @@ date <- data %>% group_by(date, count) %>% summarise(total = sum(count))
 
 
 #ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/timeseries.plot.png", height=7, width=8)
+
+#time series stuff----
+
+acf(data$count, main = "ACF Plot of Shooting Data"))
