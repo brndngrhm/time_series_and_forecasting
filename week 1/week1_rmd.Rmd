@@ -1,7 +1,0 @@
----
-title: "Week 1 HW"
-author: "Brendan Graham"
-date: "January 14, 2016"
-output: html_document
----
-
