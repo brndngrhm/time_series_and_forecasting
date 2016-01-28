@@ -115,7 +115,7 @@ names(series)[4] <- "series4"
 
 #ACF plots
 par(mfrow=c(2,2))
-acf(hw3_3$series1, main = "ACF of Series 1") # moving average?
+acf(hw3_3$series1, main = "ACF of Series 1") # random walk?
 acf(hw3_3$series2, main = "ACF of Series 2") # IID Noise
-acf(hw3_3$series3, main = "ACF of Series 3") # random walk?
+acf(hw3_3$series3, main = "ACF of Series 3") # moving average?
 acf(hw3_3$series4, main = "ACF of Series 4") # Auto-regressive process
