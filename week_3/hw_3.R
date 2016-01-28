@@ -77,13 +77,13 @@ lines(ksmooth(time(pax), pax, "normal", bandwidth=5/12), col= "red")
 lines(ksmooth(time(pax), pax, "normal", bandwidth=12), col="blue")
 
 #lowess & NN
-plot(pax, type="p", ylab="pax", main="nearest neighbor")
-lines(supsmu(time(pax), pax, span=.5),col="red")
-lines(supsmu(time(pax), pax, span=.01),col="blue")
+plot(pax, type="p", ylab="pax", main="lowess")
+lines(lowess(pax, f=.02), col = "red")
+lines(lowess(pax, f=2/3), col = "blue")
 
 plot(pax, type="p", ylab="pax", main="nearest neighbor")
-lines(supsmu(time(pax), pax, span=.5),col="red")
-lines(supsmu(time(pax), pax, span=.01),col="blue")
+lines(supsmu(time(pax), pax, span=.5),col="blue")
+lines(supsmu(time(pax), pax, span=.01),col="red")
 
 #smoothing splines
 plot(pax, type="p", ylab="pax", main="Smoothing splines")
