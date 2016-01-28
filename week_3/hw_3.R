@@ -113,8 +113,6 @@ names(series)[2] <- "series2"
 names(series)[3] <- "series3"
 names(series)[4] <- "series4"
 
-View(series)
-
 #ACF plots
 par(mfrow=c(2,2))
 acf(hw3_3$series1, main = "ACF of Series 1") # moving average?
