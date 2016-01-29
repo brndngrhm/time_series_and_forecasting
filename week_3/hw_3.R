@@ -63,32 +63,26 @@ lines(smooth.spline(time(pax), pax, spar=1), col="blue")
 par(mfrow=c(2,3))
 #moving avg
 plot(pax, type="p", main = "moving average")
-lines(mov.avg4, col = "red")
-lines(mov.avg12, col = "blue")
+lines(mov.avg12, col = "red")
 
 #Polynomial and Periodic Regression Smoothers
 plot(pax, type="p", ylab="Pax", main = "polynomial")
-lines(fitted(reg1), col="red")
-lines(fitted(reg2), col="blue")
+lines(fitted(reg2), col="red")
 
 #kernel
 plot(pax, type="p", ylab="mortality", main="kernel smoothing")
-lines(ksmooth(time(pax), pax, "normal", bandwidth=5/12), col= "red")
-lines(ksmooth(time(pax), pax, "normal", bandwidth=12), col="blue")
+lines(ksmooth(time(pax), pax, "normal", bandwidth=12), col="red")
 
 #lowess & NN
 plot(pax, type="p", ylab="pax", main="lowess")
-lines(lowess(pax, f=.02), col = "red")
-lines(lowess(pax, f=2/3), col = "blue")
+lines(lowess(pax, f=2/3), col = "red")
 
 plot(pax, type="p", ylab="pax", main="nearest neighbor")
-lines(supsmu(time(pax), pax, span=.5),col="blue")
-lines(supsmu(time(pax), pax, span=.01),col="red")
+lines(supsmu(time(pax), pax, span=.5),col="red")
 
 #smoothing splines
 plot(pax, type="p", ylab="pax", main="Smoothing splines")
-lines(smooth.spline(time(pax), pax), col="red")
-lines(smooth.spline(time(pax), pax, spar=1), col="blue")
+lines(smooth.spline(time(pax), pax, spar=1), col="red")
 
 #3----
 
@@ -118,9 +112,9 @@ par(mfrow=c(2,2))
 acf(hw3_3$series2, main = "ACF of Series 2")
 acf(hw3_3$series3, main = "ACF of Series 3")
 acf(hw3_3$series1, main = "ACF of Series 1")
-acf(hw3_3$series4, main = "ACF of Series 4")
 
-#simulation
+
+#simulations
 set.seed(1291)
 w <- rnorm(200,0,1)
 
