@@ -2,7 +2,7 @@
 title: "MAT 8444 HW 3"
 author: "Brendan Graham"
 date: "February 3, 2016"
-output: pdf_document
+output: html_document
 ---
 ###2.
 a) 
@@ -41,8 +41,8 @@ mov.avg12 <-SMA(pax, n=12)
 month1 <- time(pax) - mean(time(pax))
 month2 <- month1^2
 month3 <- month1^3
-cs <- cos(2*pi*month1)
-sn <- sin(2*pi*month1)
+cs <- cos(2*pi*month1/12)
+sn <- sin(2*pi*month1/12)
 reg1 <- lm(pax~month1 + month2 + month3, na.action=NULL)
 reg2 <- lm(pax~month1 + month2 + month3 + cs + sn, na.action=NULL)
 
@@ -56,7 +56,7 @@ lines(mov.avg12, col = "red")
 
 #Polynomial and Periodic Regression Smoothers
 plot(pax, type="p", ylab="Pax", main = "polynomial")
-lines(fitted(reg2), col="red")
+lines(fitted(reg1), col="red")
 
 #kernel
 plot(pax, type="p", ylab="mortality", main="kernel smoothing")
