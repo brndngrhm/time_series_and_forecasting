@@ -31,8 +31,8 @@ lines(mov.avg12, col = "blue")
 month1 <- time(pax) - mean(time(pax))
 month2 <- month1^2
 month3 <- month1^3
-cs <- cos(2*pi*month)
-sn <- sin(2*pi*month)
+cs <- cos(2*pi*month/12)
+sn <- sin(2*pi*month/12)
 reg1 <- lm(pax~month1 + month2 + month3, na.action=NULL)
 reg2 <- lm(pax~month1 + month2 + month3 + cs + sn, na.action=NULL)
 plot(pax, type="p", ylab="Pax")
