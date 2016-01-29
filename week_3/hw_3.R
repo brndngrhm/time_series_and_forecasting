@@ -10,6 +10,7 @@ pax <- read.table("http://www19.homepage.villanova.edu/jesse.frey/Math8444/airli
 names(pax)[1] <- "pax"
 pax <- ts(pax)
 plot(pax, type = "p")
+plot(pax)
 
 #this uses slightly different code to replicate the ex on p.71
 cmort <- ts(cmort)
@@ -20,20 +21,20 @@ lines(mov.avg5, col = "red")
 lines(mov.avg53, col = "blue")
 
 #Moving Average
-mov.avg4 <-SMA(pax, n=4) #uses TTR package
+mov.avg4 <-SMA(pax, n=2) #uses TTR package
 mov.avg12 <-SMA(pax, n=12)
 plot(pax, type="p")
 lines(mov.avg4, col = "red")
 lines(mov.avg12, col = "blue")
 
 #Polynomial and Periodic Regression Smoothers
-month <- time(pax) - mean(time(pax))
-month2 <- month^2
-month3 <- month^3
-cos <- cos(2*pi*month)
-sin <- sin(2*pi*month)
-reg1 <- lm(pax~month + month2 + month3, na.action=NULL)
-reg2 <- lm(pax~month + month2 + month3 + cos + sin, na.action=NULL)
+month1 <- time(pax) - mean(time(pax))
+month2 <- month1^2
+month3 <- month1^3
+cs <- cos(2*pi*month)
+sn <- sin(2*pi*month)
+reg1 <- lm(pax~month1 + month2 + month3, na.action=NULL)
+reg2 <- lm(pax~month1 + month2 + month3 + cs + sn, na.action=NULL)
 plot(pax, type="p", ylab="Pax")
 lines(fitted(reg1), col="red")
 lines(fitted(reg2), col="blue")
@@ -109,10 +110,10 @@ names(series)[4] <- "series4"
 
 #ACF plots
 par(mfrow=c(2,2))
-acf(hw3_3$series2, main = "ACF of Series 2")
-acf(hw3_3$series3, main = "ACF of Series 3")
-acf(hw3_3$series1, main = "ACF of Series 1")
-
+acf(series$series2, main = "ACF of Series 2")
+acf(series$series3, main = "ACF of Series 3")
+acf(series$series1, main = "ACF of Series 1")
+acf(series$series4, main = "ACF of Series 4")
 
 #simulations
 set.seed(1291)
@@ -129,7 +130,6 @@ ar1 <- arima.sim(n=200, model=list(ar=c(.5)), innov = w)
 
 #random walk simluation
 for (t in 1:200) x[t]<-x[t-1]+w[t]
-acf(x, main = "Random Walk Simulation")
 
 par(mfrow=c(2,2))
 acf(iid.noise, main = "IID Noise Simulation")
