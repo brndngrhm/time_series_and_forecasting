@@ -2,7 +2,7 @@
 title: "MAT 8444 HW 3"
 author: "Brendan Graham"
 date: "February 3, 2016"
-output: html_document
+output: pdf_document
 ---
 ###2.
 a) 
@@ -124,7 +124,7 @@ acf(series$series4, main = "ACF of Series 4")
 
 Series 2 seems to be IID, since its ACF shows no seasonaility and almost every point is contained within the blue dotted lines (which contain 95% of the points if the series were IID). The other 3 I wasn't sure about, so I created a simulations of IID, AR(1), Moving Average or Random Walk consisting of 200 observations. The ACF plots for the 4 simulated time series are below.
 
-![](sim.png)
+![](https://github.com/brndngrhm/time_series_and_forecasting/blob/master/week_3/sim.png?raw=true)
 
 Series 2 seems to match up well with a simulated IID time series, and Series 4 seems to match up well with a random walk simulation. The AR(1) simulation seems to have a slight seasonal patter, which matches with Series 1, and the moving average simulation shows more seasoniality, which matches with Series 3. So overall, Series 1 is AR(1), Series 2 is IID, Series 3 is a Moving Average, and Series 4 is a Random Walk.
 
