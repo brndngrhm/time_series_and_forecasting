@@ -115,7 +115,31 @@ names(series)[4] <- "series4"
 
 #ACF plots
 par(mfrow=c(2,2))
-acf(hw3_3$series1, main = "ACF of Series 1") # random walk?
-acf(hw3_3$series2, main = "ACF of Series 2") # IID Noise
-acf(hw3_3$series3, main = "ACF of Series 3") # moving average?
-acf(hw3_3$series4, main = "ACF of Series 4") # Auto-regressive process
+acf(hw3_3$series2, main = "ACF of Series 2")
+acf(hw3_3$series3, main = "ACF of Series 3")
+acf(hw3_3$series1, main = "ACF of Series 1")
+acf(hw3_3$series4, main = "ACF of Series 4")
+
+#simulation
+set.seed(1291)
+w <- rnorm(200,0,1)
+
+#iid noise simulation
+iid.noise <- (ts(w))
+
+#moving average simulation
+mov.avg.sim <- SMA(w, n=5)
+
+#auto-regressive process simulation
+ar1 <- arima.sim(n=200, model=list(ar=c(.5)), innov = w)
+
+#random walk simluation
+for (t in 1:200) x[t]<-x[t-1]+w[t]
+acf(x, main = "Random Walk Simulation")
+
+par(mfrow=c(2,2))
+acf(iid.noise, main = "IID Noise Simulation")
+acf(na.omit(mov.avg.sim), main = "Moving Average Simulation")
+acf(ar1, main = "AR(1) Simulation")
+acf(x, main = "Random Walk Simulation")
+
