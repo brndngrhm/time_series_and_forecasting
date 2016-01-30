@@ -230,15 +230,17 @@ month <- data %>% group_by(year, month, count) %>% summarise(total = sum(count))
   labs(x="", y="", title = "Fatal Shootings by Police per Month") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)))
 
+
 #ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/month.plot.png", height=7, width=8)
 
 
 date <- data %>% group_by(date, count) %>% summarise(total = sum(count))
 
 (timeseries.plot <- ggplot(date, aes(x=date, y=total)) + 
-  geom_point() + geom_line() + 
+  geom_point(size=.2) + geom_line(size=1) + 
   labs(x="", y="", title = "Timeseries Plot of Fatal Shootings by Police") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
-  scale_x_datetime(breaks = ("1 month")))
+  scale_x_datetime(breaks = ("1 month")) + geom_line(stat="hline", yintercept="mean", color = "red"))
+
 
 #ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/timeseries.plot.png", height=7, width=8)
