@@ -2,12 +2,9 @@
 title: "MAT 8444 HW 3"
 author: "Brendan Graham"
 date: "February 3, 2016"
-output: html_document
+output: word_document
 ---
-###2.
-a) 
-The passenger airline data seems non-stationary; there is an upward trend, seasonality and 
-increasing spread as time increases.
+2. The passenger airline data seems non-stationary - there is an upward trend, seasonality and increasing spread indicates heterogeneity.
 
 ```{r, echo = FALSE}
 
@@ -23,10 +20,10 @@ plot(pax)
 ```
 
 
-I tried 6 smoothing techniques which are presented in the figure below. The technique that I think best estimates the deseasonalized trend is the smoothing splines method which is presented below the 6 plots, along with the code used to create it.
+I tried 6 smoothing techniques which are presented in the figure below. The technique that I think best estimates the deseasonalized trend is the smoothing splines method which is re-printed below below the 6 plots, along with the code used to create it.
 
 
-```{r, echo = FALSE, warning = FALSE, fig.width = 12, fig.height=12}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 20, fig.height=20}
 
 library(TTR)
 
@@ -51,80 +48,50 @@ reg2 <- lm(pax~month1 + month2 + month3 + cs + sn, na.action=NULL)
 #all 6 plots
 par(mfrow=c(2,3))
 #moving avg
-plot(pax, type="p", main = "moving average")
+plot(pax, type="p", main = "moving average", cex.main = 3)
 lines(mov.avg12, col = "red")
 
 #Polynomial and Periodic Regression Smoothers
-plot(pax, type="p", ylab="Pax", main = "polynomial")
+plot(pax, type="p", ylab="Pax", main = "polynomial", cex.main = 3)
 lines(fitted(reg1), col="red")
 
 #kernel
-plot(pax, type="p", ylab="mortality", main="kernel smoothing")
+plot(pax, type="p", ylab="pax", main="kernel smoothing", cex.main = 3)
 lines(ksmooth(time(pax), pax, "normal", bandwidth=12), col="red")
 
 #lowess & NN
-plot(pax, type="p", ylab="pax", main="lowess")
+plot(pax, type="p", ylab="pax", main="lowess", cex.main = 3)
 lines(lowess(pax, f=2/3), col = "red")
 
-plot(pax, type="p", ylab="pax", main="nearest neighbor")
+plot(pax, type="p", ylab="pax", main="nearest neighbor", cex.main = 3)
 lines(supsmu(time(pax), pax, span=.5),col="red")
 
 #smoothing splines
-plot(pax, type="p", ylab="pax", main="Smoothing splines")
+plot(pax, type="p", ylab="pax", main="smoothing splines", cex.main = 3)
 lines(smooth.spline(time(pax), pax, spar=1), col="red")
 
 ```
 
 
-```{r, echo = TRUE, warning=FALSE, fig.width = 8, fig.height=8}
-plot(pax, type="p", ylab="pax", main="Smoothing splines")
+```{r, echo = TRUE, warning=FALSE, fig.width = 10, fig.height=10}
+plot(pax, type="p", ylab="pax", main="smoothing splines", cex.main = 1.5)
 lines(smooth.spline(time(pax), pax, spar=1), col="red")
 
 ```
 
+I chose this method because the trend line was smooth, indicating no fluctuations from seasonaility effects, and seemed to lie right in the middle of the data and provide a good estimate of trend. The moving average and kernel smoothing lines seemed like they might still be influenced by some seasonality. The lowess method seemed to underestimate the trend in passengers as time increased. The nearest neighbor method still shows slight fluctuations which could be a result of seasonality. The polynomial model is very similar to the smoothing splines model, and if my goal was to make a prediction I would choose that.
 
-I chose this method because the trend line was smooth, indicating no fluctuations from seasonaility effects, and seemed to lie right in the middle of the data and provide a good estimate of trend. The moving average and kernel smoothing lines seemed like they maight still be influenced by some seasonality.
+----------
 
+3. The ACF plots for the 4 time series are below.
 
+![](https://github.com/brndngrhm/time_series_and_forecasting/blob/master/week_3/Rplot.png?raw=true)
 
-###3. 
-The ACF plots for the 4 time series are below.
+Series 2 seems to be IID, since its ACF shows no seasonaility and almost every point is contained within the blue dotted lines (which contain 95% of the points if the series were IID). The other 3 I wasn't sure about, so I created a simulations of IID, AR(1), Moving Average and Random Walk consisting of 200 observations. The ACF plots for the 4 simulated time series are below.
 
-```{r, echo = FALSE, fig.width = 12, fig.height=12}
+![](https://github.com/brndngrhm/time_series_and_forecasting/blob/master/week_3/sim.png?raw=true)
 
-series1 <- read.table("http://www19.homepage.villanova.edu/jesse.frey/Math8444/ts1.txt", 
-                  header=FALSE, sep="", na.strings="NA",dec=".",  strip.white=TRUE)
+Series 2 seems to match up well with a simulated IID time series, and Series 4 seems to match up well with a random walk simulation. Also, on P.60 of the textbook, the ACF of global temperature modeled as a random walk process matches the shape of the ACF of Series 4. The AR(1) simulation seems to have a slight seasonal pattern, which matches with Series 1, and the moving average simulation shows more seasoniality, which matches with Series 3. Also, in a moving average process values with times that differ by 1 are correlated so I think we would expect to see a gradual change as the lag increased, as in Series 3. The noise term in an auto-regressive process leads me to think there would be more randomness or more drastic changes to the ACF plot as the lag increased, which is what Series 1 seems to show. 
 
-series2 <- read.table("http://www19.homepage.villanova.edu/jesse.frey/Math8444/ts2.txt", 
-                   header=FALSE, sep="", na.strings="NA", dec=".", strip.white=TRUE)
-
-
-series3 <- read.table("http://www19.homepage.villanova.edu/jesse.frey/Math8444/ts3.txt", 
-               header=FALSE, sep="", na.strings="NA", dec=".", strip.white=TRUE)
-
-
-series4 <- read.table("http://www19.homepage.villanova.edu/jesse.frey/Math8444/ts4.txt", 
-               header=FALSE, sep="", na.strings="NA", dec=".", strip.white=TRUE)
-
-series <- cbind(series1, series2, series3, series4)
-names(series)[1] <- "series1"
-names(series)[2] <- "series2"
-names(series)[3] <- "series3"
-names(series)[4] <- "series4"
-
-#ACF plots
-par(mfrow=c(2,2))
-acf(series$series2, main = "ACF of Series 2")
-acf(series$series3, main = "ACF of Series 3")
-acf(series$series1, main = "ACF of Series 1")
-acf(series$series4, main = "ACF of Series 4")
-
-
-```
-
-Series 2 seems to be IID, since its ACF shows no seasonaility and almost every point is contained within the blue dotted lines (which contain 95% of the points if the series were IID). The other 3 I wasn't sure about, so I created a simulations of IID, AR(1), Moving Average or Random Walk consisting of 200 observations. The ACF plots for the 4 simulated time series are below.
-
-![](https:\\github.com\brndngrhm\time_series_and_forecasting\blob\master\week_3\sim.png?raw=true)
-
-Series 2 seems to match up well with a simulated IID time series, and Series 4 seems to match up well with a random walk simulation. The AR(1) simulation seems to have a slight seasonal patter, which matches with Series 1, and the moving average simulation shows more seasoniality, which matches with Series 3. So overall, Series 1 is AR(1), Series 2 is IID, Series 3 is a Moving Average, and Series 4 is a Random Walk.
+Based on all of this, Series 1 is AR(1), Series 2 is IID, Series 3 is a Moving Average, and Series 4 is a Random Walk.
 
