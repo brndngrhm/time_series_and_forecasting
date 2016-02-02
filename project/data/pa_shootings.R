@@ -245,6 +245,6 @@ date <- data %>% group_by(date, count) %>% summarise(total = sum(count))
 
 #ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/timeseries.plot.png", height=7, width=8)
 
-#time series stuff----
+#time series stuff ----
 
-acf(data$count, main = "ACF Plot of Shooting Data"))
+acf(data$count, main = "ACF Plot of Shooting Data")
