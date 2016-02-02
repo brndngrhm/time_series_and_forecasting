@@ -64,7 +64,7 @@ A plot of the auto correlation function (ACF) shows not much seasonality in the 
 
 ```{r, echo=FALSE,fig.width=17, fig.height=11, results = "asis"}
 
-print(acf.plot)
+acf(data$count, main = "ACF Plot of Shooting Data")
 
 ```
 
