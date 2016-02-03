@@ -31,8 +31,8 @@ lines(mov.avg12, col = "blue")
 month1 <- time(pax) - mean(time(pax))
 month2 <- month1^2
 month3 <- month1^3
-cs <- cos(2*pi*month/12)
-sn <- sin(2*pi*month/12)
+cs <- cos(2*pi*month1/12)
+sn <- sin(2*pi*month1/12)
 reg1 <- lm(pax~month1 + month2 + month3, na.action=NULL)
 reg2 <- lm(pax~month1 + month2 + month3 + cs + sn, na.action=NULL)
 plot(pax, type="p", ylab="Pax")
@@ -40,7 +40,7 @@ lines(fitted(reg1), col="red")
 lines(fitted(reg2), col="blue")
 
 #Kernel Smoothing
-plot(pax, type="p", ylab="mortality")
+plot(pax, type="p", ylab="pax")
 lines(ksmooth(time(pax), pax, "normal", bandwidth=5/12), col= "red")
 lines(ksmooth(time(pax), pax, "normal", bandwidth=12), col="blue")
 
@@ -68,7 +68,7 @@ lines(mov.avg12, col = "red")
 
 #Polynomial and Periodic Regression Smoothers
 plot(pax, type="p", ylab="Pax", main = "polynomial")
-lines(fitted(reg2), col="red")
+lines(fitted(reg1), col="red")
 
 #kernel
 plot(pax, type="p", ylab="mortality", main="kernel smoothing")
@@ -129,11 +129,12 @@ mov.avg.sim <- SMA(w, n=5)
 ar1 <- arima.sim(n=200, model=list(ar=c(.5)), innov = w)
 
 #random walk simluation
-for (t in 1:200) x[t]<-x[t-1]+w[t]
+for (t in 1:200) x[t]<-x[t-1]
 
 par(mfrow=c(2,2))
 acf(iid.noise, main = "IID Noise Simulation")
 acf(na.omit(mov.avg.sim), main = "Moving Average Simulation")
 acf(ar1, main = "AR(1) Simulation")
 acf(x, main = "Random Walk Simulation")
+
 
