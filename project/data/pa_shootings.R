@@ -257,10 +257,10 @@ date <- data %>% group_by(date, count, race2) %>% summarise(total = sum(count))
   scale_x_datetime(breaks = ("1 month")) + geom_line(stat="hline", yintercept="mean", color = "red"))
 
 #weekly time series
-week <- data %>% group_by(week, count, race2) %>% summarise(total = sum(count))
+week <- data %>% group_by(year, week, count, race2) %>% summarise(total = sum(count))
 
-(week.timeseries.plot <- ggplot(week, aes(x=week, y=total)) + 
-  geom_point(size=.2) + geom_line(size=1) + 
+(week.timeseries.plot <- ggplot(na.omit(week), aes(x=week, y=total, color = year)) + 
+  geom_point(size=.2) + geom_line(size=1) + facet_grid(.~year) + 
   labs(x="", y="", title = "Timeseries Plot of Fatal Shootings by Police") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
   geom_line(stat="hline", yintercept="mean", color = "red"))
