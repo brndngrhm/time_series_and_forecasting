@@ -39,7 +39,7 @@ data$age2[18 <= data$age & data$age < 30] <- "18 to 29"
 data$age2[30 <= data$age & data$age < 45] <- "30 to 44"
 data$age2[45 <= data$age] <- "45 and Older"
 data$age2[data$age == 0] <- "Unknown"
-data$age2 <- as.factor(data$age2)
+
 
 #loads and checks structure
 #View(data)
@@ -74,6 +74,11 @@ date.ref$date <- ymd(date.ref$date)
 #joins data and date.ref dataframes and replaces na with 0's
 data <- merge(data,date.ref,by.x='date',by.y='date',all.x=T,all.y=T)
 data$count[is.na(data$count)] <- 0
+
+#replaces NA in age 2 with NA, then makes a factor
+data$race2[is.na(data$race2)] <- "NA"
+data$age2 <- as.factor(data$age2)
+
 
 #writes .csv file
 #write.csv(data, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/data/shootings.csv")
@@ -234,10 +239,18 @@ month <- data %>% group_by(year, month, count) %>% summarise(total = sum(count))
 #ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/month.plot.png", height=7, width=8)
 
 
-date <- data %>% group_by(date, count) %>% summarise(total = sum(count))
+date <- data %>% group_by(race2, date, count, race2) %>% summarise(total = sum(count))
 
 (timeseries.plot <- ggplot(date, aes(x=date, y=total)) + 
   geom_point(size=.2) + geom_line(size=1) + 
+  labs(x="", y="", title = "Timeseries Plot of Fatal Shootings by Police") + theme_bg + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
+  scale_x_datetime(breaks = ("1 month")) + geom_line(stat="hline", yintercept="mean", color = "red"))
+
+
+(timeseries.facet.plot <- ggplot(date, aes(x=date, y=total)) + 
+  geom_point(size=.2) + geom_line(size=1) + 
+  facet_grid(race2 ~ .) + 
   labs(x="", y="", title = "Timeseries Plot of Fatal Shootings by Police") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
   scale_x_datetime(breaks = ("1 month")) + geom_line(stat="hline", yintercept="mean", color = "red"))
