@@ -22,3 +22,37 @@ plot(0:50,c,type='h',xlab='Lag', main = "ACF of Part (c)")
 plot(0:50,d,type='h',xlab='Lag', main = "ACF of Part (d)")
 
 dev.off()
+
+#checking 1----
+#a
+p <- c(1, 0.2, -.48)
+polyroot(p)
+
+#b
+p <- c(1, 1.9, .88)
+polyroot(p)
+
+p <- c(1, .2, .7)
+polyroot(p)
+
+#c
+p <- c(1, .6)
+polyroot(p)
+
+p <- c(1, 1.2)
+polyroot(p)
+
+#d
+p <- c(1, 1.8, .81)
+polyroot(p)
+
+#e
+p <- c(1, 1.6)
+polyroot(p)
+
+p <- c(1, -.4, .04)
+polyroot(p)
+
+
+
+
