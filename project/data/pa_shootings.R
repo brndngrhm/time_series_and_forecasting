@@ -31,7 +31,7 @@ data$race2[data$race == "W"] <- "White"
 data$race2[data$race == "B"] <- "Black"
 data$race2[data$race == "H"] <- "Hispanic"
 data$race2[data$race == " "] <- "Unknown"
-data$race2 <- as.factor(data$race2)
+
 
 #creates age buckets
 data$age2 <- "Under 18"
@@ -39,7 +39,7 @@ data$age2[18 <= data$age & data$age < 30] <- "18 to 29"
 data$age2[30 <= data$age & data$age < 45] <- "30 to 44"
 data$age2[45 <= data$age] <- "45 and Older"
 data$age2[data$age == 0] <- "Unknown"
-
+data$age2 <- as.factor(data$age2)
 
 #loads and checks structure
 #View(data)
@@ -77,7 +77,7 @@ data$count[is.na(data$count)] <- 0
 
 #replaces NA in age 2 with NA, then makes a factor
 data$race2[is.na(data$race2)] <- "NA"
-data$age2 <- as.factor(data$age2)
+data$race2 <- as.factor(data$race2)
 
 
 #writes .csv file
@@ -239,7 +239,7 @@ month <- data %>% group_by(year, month, count) %>% summarise(total = sum(count))
 #ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/month.plot.png", height=7, width=8)
 
 
-date <- data %>% group_by(race2, date, count, race2) %>% summarise(total = sum(count))
+date <- data %>% group_by(date, count, race2) %>% summarise(total = sum(count))
 
 (timeseries.plot <- ggplot(date, aes(x=date, y=total)) + 
   geom_point(size=.2) + geom_line(size=1) + 
