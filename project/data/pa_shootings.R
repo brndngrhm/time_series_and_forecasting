@@ -19,6 +19,7 @@ data <- read.csv(text = x)
 data$date <- ymd(data$date)
 data$age <- as.numeric(data$age)
 data$month <- month(data$date, label = TRUE)
+data$week <- week(data$date)
 data$year <- year(data$date)
 data$year <- as.factor(data$year)
 data$day <- wday(data$date, label = TRUE, abbr = TRUE)
@@ -238,7 +239,7 @@ month <- data %>% group_by(year, month, count) %>% summarise(total = sum(count))
 
 #ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/month.plot.png", height=7, width=8)
 
-
+#daily time series
 date <- data %>% group_by(date, count, race2) %>% summarise(total = sum(count))
 
 (timeseries.plot <- ggplot(date, aes(x=date, y=total)) + 
@@ -254,6 +255,22 @@ date <- data %>% group_by(date, count, race2) %>% summarise(total = sum(count))
   labs(x="", y="", title = "Timeseries Plot of Fatal Shootings by Police") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
   scale_x_datetime(breaks = ("1 month")) + geom_line(stat="hline", yintercept="mean", color = "red"))
+
+#weekly time series
+week <- data %>% group_by(week, count, race2) %>% summarise(total = sum(count))
+
+(week.timeseries.plot <- ggplot(week, aes(x=week, y=total)) + 
+  geom_point(size=.2) + geom_line(size=1) + 
+  labs(x="", y="", title = "Timeseries Plot of Fatal Shootings by Police") + theme_bg + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
+  geom_line(stat="hline", yintercept="mean", color = "red"))
+
+(week.timeseries.facet.plot <- ggplot(week, aes(x=week, y=total)) + 
+  geom_point(size=.2) + geom_line(size=1) + 
+  facet_grid(race2 ~ .) + 
+  labs(x="", y="", title = "Timeseries Plot of Fatal Shootings by Police") + theme_bg + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
+  geom_line(stat="hline", yintercept="mean", color = "red"))
 
 
 #ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/timeseries.plot.png", height=7, width=8)
