@@ -19,6 +19,7 @@ data <- read.csv(text = x)
 data$date <- ymd(data$date)
 data$age <- as.numeric(data$age)
 data$month <- month(data$date, label = TRUE)
+data$week <- week(data$date)
 data$year <- year(data$date)
 data$year <- as.factor(data$year)
 data$day <- wday(data$date, label = TRUE, abbr = TRUE)
@@ -31,7 +32,7 @@ data$race2[data$race == "W"] <- "White"
 data$race2[data$race == "B"] <- "Black"
 data$race2[data$race == "H"] <- "Hispanic"
 data$race2[data$race == " "] <- "Unknown"
-data$race2 <- as.factor(data$race2)
+
 
 #creates age buckets
 data$age2 <- "Under 18"
@@ -74,6 +75,11 @@ date.ref$date <- ymd(date.ref$date)
 #joins data and date.ref dataframes and replaces na with 0's
 data <- merge(data,date.ref,by.x='date',by.y='date',all.x=T,all.y=T)
 data$count[is.na(data$count)] <- 0
+
+#replaces NA in age 2 with NA, then makes a factor
+data$race2[is.na(data$race2)] <- "NA"
+data$race2 <- as.factor(data$race2)
+
 
 #writes .csv file
 #write.csv(data, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/data/shootings.csv")
@@ -233,14 +239,38 @@ month <- data %>% group_by(year, month, count) %>% summarise(total = sum(count))
 
 #ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/month.plot.png", height=7, width=8)
 
-
-date <- data %>% group_by(date, count) %>% summarise(total = sum(count))
+#daily time series
+date <- data %>% group_by(date, count, race2) %>% summarise(total = sum(count))
 
 (timeseries.plot <- ggplot(date, aes(x=date, y=total)) + 
   geom_point(size=.2) + geom_line(size=1) + 
   labs(x="", y="", title = "Timeseries Plot of Fatal Shootings by Police") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
   scale_x_datetime(breaks = ("1 month")) + geom_line(stat="hline", yintercept="mean", color = "red"))
+
+
+(timeseries.facet.plot <- ggplot(date, aes(x=date, y=total)) + 
+  geom_point(size=.2) + geom_line(size=1) + 
+  facet_grid(race2 ~ .) + 
+  labs(x="", y="", title = "Timeseries Plot of Fatal Shootings by Police") + theme_bg + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
+  scale_x_datetime(breaks = ("1 month")) + geom_line(stat="hline", yintercept="mean", color = "red"))
+
+#weekly time series
+week <- data %>% group_by(year, week, count, race2) %>% summarise(total = sum(count))
+
+(week.timeseries.plot <- ggplot(na.omit(week), aes(x=week, y=total, color = year)) + 
+  geom_point(size=.2) + geom_line(size=1) + facet_grid(.~year) + 
+  labs(x="", y="", title = "Timeseries Plot of Fatal Shootings by Police") + theme_bg + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
+  geom_line(stat="hline", yintercept="mean", color = "red"))
+
+(week.timeseries.facet.plot <- ggplot(week, aes(x=week, y=total)) + 
+  geom_point(size=.2) + geom_line(size=1) + 
+  facet_grid(race2 ~ .) + 
+  labs(x="", y="", title = "Timeseries Plot of Fatal Shootings by Police") + theme_bg + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
+  geom_line(stat="hline", yintercept="mean", color = "red"))
 
 
 #ggsave("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/plots/timeseries.plot.png", height=7, width=8)

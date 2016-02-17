@@ -14,7 +14,7 @@ The data consists of fatal police shootings in the U.S. between `r min(data$date
 
 I also added the following variables: year, month, day, number of victims,^[Each row consisted of only 1 or 0 victims, but adding this variable helped to aggregate the data for plotting purposes.] and current population estimate for each city in the data set^[This allowed me to compute fatal shootings by police per 100,000 residents for a better comparison among states]. I also grouped the race variable into `r nlevels(data$race2)` categories (`r levels(data$race2)`) and grouped age into `r nlevels(data$age2)` categories (`r levels(data$age2)`).
 
-The mean number of fatal police shootings per day in the data is `r format(mean(date$count), digits=2)` with a standard deviation of `r format(sd(date$count), digits=2)`. The tables below show the total number of daily fatal police shootings by race, by age category, and presence of a weapon. Most victims of fatal police shootings were `r race[1,1]` (`r race[1,2]` `r race[1,1]` victims vs. `r race[2,2]` `r race[2,1]` victims) and between the age of `r age[1,1]`. Most victims were armed with a `r armed[1,1]` at the time of the shooting and their threat level was reported as "`r threat.level[1,1]`". In terms of location, most fatal police shootings occured in `r city[1,1]` with `r city[1,2]` shootings, followed by `r city[2,1]` and `r city[3,1]`, each with`r city[3,2]` shootings. However, `r per.capita[1,1]`, `r per.capita[2,1]` and `r per.capita[3,1]` had the most fatal police shootings per 100,000 residents.
+The mean number of fatal police shootings per day in the data is `r format(mean(date$count), digits=3)` with a standard deviation of `r format(sd(date$count), digits=2)`. The tables below show the total number of daily fatal police shootings by race, by age category, and presence of a weapon. Most victims of fatal police shootings were `r race[1,1]` (`r race[1,2]` `r race[1,1]` victims vs. `r race[2,2]` `r race[2,1]` victims) and between the age of `r age[1,1]`. Most victims were armed with a `r armed[1,1]` at the time of the shooting and their threat level was reported as "`r threat.level[1,1]`". In terms of location, most fatal police shootings occured in `r city[1,1]` with `r city[1,2]` shootings, followed by `r city[2,1]` and `r city[3,1]`, each with`r city[3,2]` shootings. However, `r per.capita[1,1]`, `r per.capita[2,1]` and `r per.capita[3,1]` had the most fatal police shootings per 100,000 residents.
 
 ```{r, echo = FALSE, results = "asis", warnings = FALSE}
 
@@ -50,7 +50,7 @@ knitr::kable(head(armed, 10))
 
 ```
 
-The monthly bar plot below shows peaks of fatal shootings in May, July and December 2015. Below that, the timeseries plot shows a fairly consistent spread around a mean of `r format(mean(date$total), digits=3)` fatal police shootings per day.
+The monthly bar plot below shows peaks of fatal shootings in May, July and December 2015. Below that, the timeseries plot shows a fairly consistent spread around a mean of `r format(mean(date$count), digits=3)` fatal police shootings per day.
 
 ```{r, echo = FALSE, fig.width=15, fig.height=8}
 print(month.plot)
