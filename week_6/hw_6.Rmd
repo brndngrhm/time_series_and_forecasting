@@ -27,13 +27,19 @@ wins2 <- wins
 wins2[1] <- NULL
 wins2 <- ts(wins2, frequency = 1)
 
-
 #plot acf and pacf
 plot(wins2, type="o")
 diff <- diff(wins2)
 plot(diff, type="o")
 acf2(wins2)
 acf2(diff)
+
+uplim=4
+aicmat=matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat[i+1,j+1]=arima(wins2,order=c(i,0,j))$aic}}
+aicmat
 
 ```
 
