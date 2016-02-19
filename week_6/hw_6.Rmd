@@ -59,7 +59,7 @@ print(acf2(wins2, main = "ACF and PACF Plots"))
 
 ```
 
-The ACF plot indicates a 4 term moving average would be good to use since after a lag of 4 the time series appears like whit noise, and the PACF plot indicates an 1 AR term may be good to use for the same reason. Fitting this model with 1 round of differencing gives the following results:
+The ACF plot indicates a 4 term moving average would be good to use since after a lag of 4 the time series appears like white noise, and the PACF plot indicates 1 AR term may be good to use for the same reason. Fitting this model gives the following results:
 
 ```{r, echo=TRUE, warning=FALSE}
 
@@ -68,7 +68,7 @@ model.1 <- sarima(wins2, 1, 0, 4, details=F)
 model.1
 ```
 
-The standardized residuals and the ACF of the residuals look like white noise, the normal Q-Q plot indicates the residuals are normally distributed and the p-values are all very high. The aic value is -288.45. To see if the number of terms can be reduced while still maintaining a low aic value, I created a matrix using the code from the class website which indicates I could lower the aic value and include fewer terms.
+The standardized residuals and the ACF of the residuals look like white noise, the normal Q-Q plot indicates the residuals are normally distributed and the p-values are all very high. The aic value is -288.45. To see if the number of terms can be reduced while still maintaining a low aic value, I created a matrix using the code from the class website which indicates I could lower the aic value by including fewer terms.
 
 ```{r, echo = FALSE}
 
@@ -89,7 +89,7 @@ This is my preferred model since it has lower aic value and all of the diagnosti
 
 The full equation is Xt=0.5295Xt-1 + 0.1768Xt-2 + Wt.
 
-USing the model to predict the Phillies win percentage in 2016 gives the following results:
+USing the model to predict the Phillies win percentage in 2016 indicates the win percentage will be 0.422 in 2016.
 
 ```{r, echo = FALSE, warning=FALSE}
 
