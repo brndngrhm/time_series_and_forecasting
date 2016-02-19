@@ -35,25 +35,10 @@ plot(diff, type="o")
 acf2(wins2)
 acf2(diff)
 
-#fit some models
-
-model.1 <- sarima(diff, 1, 0, 0, details=F)
-model.2 <- sarima(diff, 2, 0, 1, details=F)
-model.3 <- sarima(diff, 1, 0, 2, details=F)
-
-#AIC MAtrix to pick best # of terms
-dat <- diff
-uplim <- 4
-aicmat <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
-for (i in 0:uplim){
-  for (j in 0:uplim){
-    aicmat[i+1,j+1]=arima(diff,order=c(i,0,j))$aic}}
-aicmat
-
 ```
 
 
-A time series plot of the Phillies win percentage from 1901-2015 is shown in the plot below, along with ACF and PACF plots. The time series plot doesn't indicate any heterogeneity of variance over time, but the ACF indicates some slight seasonality, so differencing may be necessary.
+A time series plot of the Phillies win percentage from 1901-2015 is shown in the plot below, along with ACF and PACF plots. The time series plot doesn't indicate any heterogeneity of variance over time or apparent trend, and the ACF plot doesn't indicate much  seasonality, so no differencing seems necessary.
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE}
 
@@ -61,22 +46,50 @@ plot(wins2, type="o")
 
 ```
 
-```{r, echo = FALSE, message=FALSE, warning=FALSE, results='asis'}
-
-acf2(wins2, main = "ACF and PACF Plots")
-
-```
-
-The differenced time series, ACF and PACF plots are consistent with white noise, which may be good for fitting a model.
-
-```{r, echo=FALSE, warning=FALSE}
-
-plot(diff, type="o")
-
-```
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE, results='asis'}
 
-acf2(diff, main = "Differenced ACF and PACF Plots")
+print(acf2(wins2, main = "ACF and PACF Plots"))
 
 ```
+
+The ACF plot indicates a 4 term moving average would be good to use since after a lag of 4 the time series appears like whit noise, and the PACF plot indicates an 1 AR term may be good to use for the same reason. Fitting this model with 1 round of differencing gives the following results:
+
+```{r, echo=TRUE, warning=FALSE}
+
+model.1 <- sarima(wins2, 1, 0, 4, details=F)
+
+model.1
+```
+
+The standardized residuals and the ACF of the residuals look like white noise, the normal Q-Q plot indicates the residuals are normally distributed and the p-values are all very high. The aic value is -288.45. To see if the number of terms can be reduced while still maintaining a low aic value, I created a matrix using the code from the class website which indicates I could lower the aic value and include fewer terms.
+
+```{r, echo = FALSE}
+
+aicmat
+
+```
+
+A new AR(2) model gives the following results:
+
+```{r} {r, echo=TRUE, warning=FALSE}
+
+model.2 <- sarima(wins2, 2, 0, 0, details=F)
+
+model.2
+```
+
+This is my preferred model since it has lower aic value and all of the diagnostic plots look the same or better.
+
+The full equation is Xt=0.5295Xt-1 + 0.1768Xt-2 + Wt.
+
+USing the model to predict the Phillies win percentage in 2016 gives the following results:
+
+```{r, echo = FALSE, warning=FALSE}
+
+sarima.for(wins2, 1, 0, 0, 0, 2, 0, 0, 1)
+
+```
+
+
+
