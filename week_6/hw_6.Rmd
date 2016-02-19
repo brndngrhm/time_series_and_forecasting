@@ -8,6 +8,7 @@ output: html_document
 ```{r, echo = FALSE, warning=FALSE, message=FALSE, include=FALSE}
 
 library(ggplot2)
+library(astsa)
 
 #2
 #read in data and plot
@@ -20,6 +21,7 @@ names(wins)[2] <- "win"
 (ts.plot <- ggplot(wins, aes(x=year, y=win)) + geom_point() + geom_line() + 
   labs(x="\nYear", y="Win Percentage\n", title = "Phillies Win Percentage: 1901-2015'n", size = 14))
 
+
 #format as time series
 wins2 <- wins
 wins2[1] <- NULL
@@ -27,25 +29,54 @@ wins2 <- ts(wins2, frequency = 1)
 
 
 #plot acf and pacf
-acf(wins2)
-pacf(wins2)
+plot(wins2, type="o")
+diff <- diff(wins2)
+plot(diff, type="o")
+acf2(wins2)
+acf2(diff)
+
+#fit some models
+
+model.1 <- sarima(diff, 1, 0, 0, details=F)
+model.2 <- sarima(diff, 2, 0, 1, details=F)
+model.3 <- sarima(diff, 1, 0, 2, details=F)
+
+#AIC MAtrix to pick best # of terms
+dat <- diff
+uplim <- 4
+aicmat <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat[i+1,j+1]=arima(diff,order=c(i,0,j))$aic}}
+aicmat
 
 ```
 
 
-A time series plot of the Phillies win percentage from 1901-2015 is shown in the plot below, along with ACF and PACF plots.
+A time series plot of the Phillies win percentage from 1901-2015 is shown in the plot below, along with ACF and PACF plots. The time series plot doesn't indicate any heterogeneity of variance over time, but the ACF indicates some slight seasonality, so differencing may be necessary.
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE}
 
-print(ts.plot)
+plot(wins2, type="o")
 
 ```
 
-```{r, echo = FALSE,}
+```{r, echo = FALSE, message=FALSE, warning=FALSE, results='asis'}
 
-acf(wins2, main = "ACF")
-
-pacf(wins2, main = "PACF")
+acf2(wins2, main = "ACF and PACF Plots")
 
 ```
 
+The differenced time series, ACF and PACF plots are consistent with white noise, which may be good for fitting a model.
+
+```{r, echo=FALSE, warning=FALSE}
+
+plot(diff, type="o")
+
+```
+
+```{r, echo = FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+acf2(diff, main = "Differenced ACF and PACF Plots")
+
+```
