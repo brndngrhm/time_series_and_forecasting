@@ -21,5 +21,12 @@ wins2 <- ts(wins2, frequency = 1)
 
 
 #plot acf and pacf
-acf(wins2)
-pacf(wins2)
+plot(wins2, type="o")
+diff <- diff(wins2)
+plot(diff, type="o")
+acf2(wins2)
+acf2(diff)
+
+#fit
+
+sarima(wins2)
