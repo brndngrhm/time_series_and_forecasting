@@ -1,0 +1,51 @@
+---
+title: "Brendan Graham HW 6 MAT8444"
+author: ""
+date: "February 24, 2016"
+output: html_document
+---
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE, include=FALSE}
+
+library(ggplot2)
+
+#2
+#read in data and plot
+wins <- read.table("http://www19.homepage.villanova.edu/jesse.frey/Math8444/Phillies2015.txt", 
+                   header=FALSE, sep="", na.strings="NA", dec=".", strip.white=TRUE)
+
+names(wins)[1] <- "year"
+names(wins)[2] <- "win"
+
+(ts.plot <- ggplot(wins, aes(x=year, y=win)) + geom_point() + geom_line() + 
+  labs(x="\nYear", y="Win Percentage\n", title = "Phillies Win Percentage: 1901-2015'n", size = 14))
+
+#format as time series
+wins2 <- wins
+wins2[1] <- NULL
+wins2 <- ts(wins2, frequency = 1)
+
+
+#plot acf and pacf
+acf(wins2)
+pacf(wins2)
+
+```
+
+
+A time series plot of the Phillies win percentage from 1901-2015 is shown in the plot below, along with ACF and PACF plots.
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+
+print(ts.plot)
+
+```
+
+```{r, echo = FALSE,}
+
+acf(wins2, main = "ACF")
+
+pacf(wins2, main = "PACF")
+
+```
+
