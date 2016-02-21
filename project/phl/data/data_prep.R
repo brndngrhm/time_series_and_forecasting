@@ -51,7 +51,6 @@ phl$month <- NULL
 names(phl)[3] <- "month"
 phl$date <- paste(phl$month, "1,", phl$year, sep=" ")
 phl$date <- mdy(phl$date)
-
 write.csv(phl, file = "~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.csv")
 
 #emp ----
@@ -108,6 +107,6 @@ earnings <- earnings[-c(105, 106, 107, 108), ]
 socio <- left_join(emp, earnings, by = c("year", "month"))
 phl <- left_join(phl, socio, by = c("year", "month"))
 phl$year <- as.factor(phl$year)
-
+phl <- phl %>% select(date, year, month, pax, emp, earnings)
 save(phl, file = "~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.rda") 
 
