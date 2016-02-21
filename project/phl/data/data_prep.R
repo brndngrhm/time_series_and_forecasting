@@ -49,7 +49,9 @@ phl <- pax %>% filter(origin == "PHL") %>% group_by(year, month) %>% summarise("
 phl$month2 <- month(phl$month, label = TRUE)
 phl$month <- NULL
 names(phl)[3] <- "month"
-phl <- phl %>% select(year, month, pax)
+phl$date <- paste(phl$month, "1,", phl$year, sep=" ")
+phl$date <- mdy(phl$date)
+
 write.csv(phl, file = "~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.csv")
 
 #emp ----
