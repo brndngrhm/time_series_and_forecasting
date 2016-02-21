@@ -108,3 +108,4 @@ phl <- left_join(phl, socio, by = c("year", "month"))
 phl$year <- as.factor(phl$year)
 
 save(phl, file = "~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.rda") 
+
