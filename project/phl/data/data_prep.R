@@ -4,8 +4,39 @@ library(dplyr)
 library(lubridate)
 library(tidyr)
 library(reshape2)
+library(RCurl)
+library(rvest)
 
 #read enplanement data, format and combine ----
+
+x.2007 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2007.csv")
+data.2007 <- read.csv(text = x.2007)
+
+x.2008 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2008.csv")
+data.2008 <- read.csv(text = x.2008)
+
+x.2009 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2009.csv")
+data.2009 <- read.csv(text = x.2009)
+
+x.2010 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2010.csv")
+data.2010 <- read.csv(text = x.2010)
+
+x.2011 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2011.csv")
+data.2011 <- read.csv(text = x.2011)
+
+x.2012 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2012.csv")
+data.2012 <- read.csv(text = x.2012)
+
+x.2013 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2013.csv")
+data.2013 <- read.csv(text = x.2013)
+
+x.2014 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2014.csv")
+data.2014 <- read.csv(text = x.2014)
+
+x.2015 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2015.csv")
+data.2015 <- read.csv(text = x.2015)
+
+
 data.2007 <- read.csv("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/2007.csv")
 data.2008 <- read.csv("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/2008.csv")
 data.2009 <- read.csv("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/2009.csv")
