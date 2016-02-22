@@ -146,5 +146,5 @@ socio <- left_join(emp, earnings, by = c("year", "month"))
 phl <- left_join(phl, socio, by = c("year", "month"))
 phl$year <- as.factor(phl$year)
 phl <- phl %>% select(date, year, month, pax, emp, earnings)
-save(phl, file = "~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.rda") 
+save(phl, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/phl.rda") 
 
