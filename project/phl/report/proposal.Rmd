@@ -7,7 +7,7 @@ output: html_document
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE, include=FALSE}
 
-load("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.rda")
+#load("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.rda")
 
 library(ggplot2)
 library(dplyr)
