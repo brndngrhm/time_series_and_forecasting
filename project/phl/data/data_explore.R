@@ -5,7 +5,7 @@ library(dplyr)
 library(scales)
 library(astsa)
 
-load("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.rda")
+load("~/time_series_and_forecasting/project/phl/data/phl.rda")
 
 #some plots
 (pax.plot <- ggplot(phl, aes(x=date, y=pax)) + 
