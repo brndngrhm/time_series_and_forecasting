@@ -2,7 +2,7 @@
 title: "Time Series Project Proposal"
 author: "Brendan Graham"
 date: "February 24, 2016"
-output: html_document
+output: word_document
 ---
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE, include=FALSE}
@@ -18,13 +18,13 @@ library(ggthemes)
   geom_point() + geom_line() + 
   labs(x= "", y= "Enplanements\n", title = "PHL Monthly Enplanements: 2007-2015\n") + 
   scale_x_datetime(breaks = date_breaks("1 year")) + 
-  theme(axis.text.x = element_text(angle = 90, vjust = -.5)) + theme_hc())
+  theme(axis.text.x = element_text(angle = 90, vjust = .5)) + theme_hc())
 
 (emp.plot <- ggplot(phl, aes(x=date, y=emp)) + 
   geom_point() + geom_line() + 
   labs(x= "", y= "Employment\n", title = "PHL Monthly Employment: 2007-2015\n") + 
   scale_x_datetime(breaks = date_breaks("1 year")) + 
-  theme(axis.text.x = element_text(angle = 90, vjust = -.5)) + theme_hc())
+  theme(axis.text.x = element_text(angle = 90, vjust = .5)) + theme_hc())
 
 (earn.plot <- ggplot(phl, aes(x=date, y=earnings)) + geom_point() + geom_line() + 
   labs(x= "", y= "Earnings\n", title = "PHL Monthly Earnings: 2007-2015\n") + 
