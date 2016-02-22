@@ -1,0 +1,61 @@
+---
+title: "Time Series Project Proposal"
+author: "Brendan Graham"
+date: "February 21, 2016"
+output: word_document
+---
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE, include=FALSE}
+
+load("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.rda")
+
+library(ggplot2)
+library(dplyr)
+library(scales)
+library(ggthemes)
+
+(pax.plot <- ggplot(phl, aes(x=date, y=pax)) + 
+  geom_point() + geom_line() + 
+  labs(x= "", y= "Enplanements\n", title = "PHL Monthly Enplanements: 2007-2015\n") + 
+  scale_x_datetime(breaks = date_breaks("1 year")) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = -.5)) + theme_hc())
+
+(emp.plot <- ggplot(phl, aes(x=date, y=emp)) + 
+  geom_point() + geom_line() + 
+  labs(x= "", y= "Employment\n", title = "PHL Monthly Employment: 2007-2015\n") + 
+  scale_x_datetime(breaks = date_breaks("1 year")) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = -.5)) + theme_hc())
+
+(earn.plot <- ggplot(phl, aes(x=date, y=earnings)) + geom_point() + geom_line() + 
+  labs(x= "", y= "Earnings\n", title = "PHL Monthly Earnings: 2007-2015\n") + 
+  scale_x_datetime(breaks = date_breaks("1 year")) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = .5)) + theme_hc())
+
+```
+
+
+A current project at my job consists of reviewing the use of socioeconomic data in airport forecasting practices, so I thought it would be interesting to develop an airport forecast using historical enplanements as well as income and employment data for the Philadelphia area ("Enplanement" is an industry term for boarding an aircraft). 
+
+
+The data set I have consists of 104 monthly observations of enplanements, employment and income from 2007 to August 2015. The enplanement data is T-100 domestic market data from the Bureau of Transportation Statistics which consists of monthly enplanements by originating airport.^[http://www.transtats.bts.gov/DL_SelectFields.asp?Table_ID=310&DB_Short_Name=Air%20Carriers] The employment data is from the Current Employment Statistics (CES) program run by the Bureau of Labor Statistics and consists of not seasonally adjusted, non-farm employees for the Philadelphia Metropolitan Division.^[http://www.bls.gov/sae/] The earnings data also comes from CES and consists of average weekly earnings for private (non-governmental) employees for the Philadelphia Metropolitan Division.^[The Philadelphia Metropolitan Division is a sub-division of the Philadelphia-Camden-Wilmington Metropolitan Statistical Area].
+
+```{r, echo = FALSE, fig.height=10, fig.width=10}
+
+print(pax.plot)
+
+```
+
+```{r, echo = FALSE, fig.height=10, fig.width=10}
+
+print(emp.plot)
+
+```
+
+```{r, echo = FALSE, fig.height=10, fig.width=10}
+
+print(earn.plot)
+
+```
+
+
+One of the aims of the project at my work is to explore if the use of socioeconomic data improves passenger forecasts, so I think it would be interesting to develop a forecast using only the historical data and then a second forecast using the historical data combinsed with the employment and earnings data and see if the model improves.
