@@ -44,7 +44,7 @@ aicmat
 ```
 
 
-A time series plot of the Phillies win percentage from 1901-2015 is shown in the plot below, along with ACF and PACF plots. The time series plot doesn't indicate any heterogeneity of variance over time or apparent trend, and the ACF plot doesn't indicate much  seasonality, so no differencing seems necessary.
+3. A time series plot of the Phillies win percentage from 1901-2015 is shown in the plot below, along with ACF and PACF plots. The time series plot doesn't indicate any heterogeneity of variance over time or apparent trend, and the ACF plot doesn't indicate much  seasonality, so no differencing seems necessary.
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE}
 
