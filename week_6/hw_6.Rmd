@@ -87,7 +87,7 @@ model.2
 
 This is my preferred model since it has lower aic value and all of the diagnostic plots look the same or better. The only diagnostic plot that could be improved is the normal Q-Q plot, which currently shows some skewness, especially in the lower tail.
 
-The full equation is X~t~=0.5295*X*~t-1~ + 0.1768*X*~t-2~ + *W*~t~.
+The full equation is X~t~ = 0.5295*X*~t-1~ + 0.1768*X*~t-2~ + *W*~t~.
 
 Using the model to predict the Phillies win percentage in 2016 indicates the win percentage will be 0.422 in 2016.
 
