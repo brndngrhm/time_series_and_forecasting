@@ -22,7 +22,6 @@ load("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/da
   labs(x= "", y= "Earnings\n", title = "PHL Monthly Earnings: 2007-2015\n") + 
   scale_x_datetime(breaks = date_breaks("1 year")))
 
-
 #formatting as time series
 phl.ts <- ts(phl)
 plot(phl.ts, type = "o")
