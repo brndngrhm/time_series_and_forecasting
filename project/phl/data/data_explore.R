@@ -23,7 +23,10 @@ load("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/da
   scale_x_datetime(breaks = date_breaks("1 year")))
 
 #formatting as time series
-phl.ts <- ts(phl)
-plot(phl.ts, type = "o")
+pax <- ts(phl$pax)
+emp <- ts(phl$emp)
+earnings <- ts(phl$earnings)
 
-acf2(phl.ts)
+acf2(pax)
+acf2(emp)
+acf2(earnings)
