@@ -3,15 +3,11 @@
 library(ggplot2)
 library(dplyr)
 library(scales)
+library(astsa)
 
 load("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.rda")
 
-#formatting as time series
-phl.ts <- ts(phl)
-plot(phl.ts, type = "o")
-
 #some plots
-
 (pax.plot <- ggplot(phl, aes(x=date, y=pax)) + 
   geom_point() + geom_line() + 
   labs(x= "", y= "Enplanements\n", title = "PHL Monthly Enplanements: 2007-2015\n") + 
@@ -25,3 +21,10 @@ plot(phl.ts, type = "o")
 (earn.plot <- ggplot(phl, aes(x=date, y=earnings)) + geom_point() + geom_line() + 
   labs(x= "", y= "Earnings\n", title = "PHL Monthly Earnings: 2007-2015\n") + 
   scale_x_datetime(breaks = date_breaks("1 year")))
+
+
+#formatting as time series
+phl.ts <- ts(phl)
+plot(phl.ts, type = "o")
+
+acf2(phl.ts)
