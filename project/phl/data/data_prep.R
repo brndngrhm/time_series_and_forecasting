@@ -82,7 +82,7 @@ phl$month <- NULL
 names(phl)[3] <- "month"
 phl$date <- paste(phl$month, "1,", phl$year, sep=" ")
 phl$date <- mdy(phl$date)
-write.csv(phl, file = "~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.csv")
+#write.csv(phl, file = "~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.csv")
 
 #emp ----
 
@@ -115,7 +115,7 @@ emp <- emp[-c(105, 106, 107, 108), ]
 
 #earnings ----
 x.earn <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/phl_avg_wk_earn.csv")
-earings <- read.csv(text = x.earn)
+earnings <- read.csv(text = x.earn)
 #earnings <- (read.csv("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl_avg_wk_earn.csv"))
 
 earnings <-  melt(earnings, id.vars = c("Year"))
