@@ -1,18 +1,19 @@
 #time series exploration
 
+#packages ----
 library(ggplot2)
 library(dplyr)
 library(scales)
 library(astsa)
 
+#load data ----
 #for work
 load("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/phl.rda")
 
 #for home
 #load("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.rda")
 
-
-#some plots
+#some plots ----
 (pax.plot <- ggplot(phl, aes(x=date, y=pax)) + 
   geom_point() + geom_line() + 
   labs(x= "", y= "Enplanements\n", title = "PHL Monthly Enplanements: 2007-2015\n") + 
@@ -45,8 +46,7 @@ load("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forec
   theme(axis.title.y=element_text(size=20, vjust=1.5)) +
   theme(axis.title.x=element_text(size=18, vjust=-.5)))
 
-
-#formatting as time series
+#formatting as time series ----
 phl.ts <- phl
 phl.ts[1] <- NULL
 phl.ts[1] <- NULL
