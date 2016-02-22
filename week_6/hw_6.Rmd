@@ -59,7 +59,7 @@ print(acf2(wins2, main = "ACF and PACF Plots"))
 
 ```
 
-The ACF plot indicates a 4 term moving average would be good to use since after a lag of 4 the time series appears like white noise, and the PACF plot indicates 1 AR term may be good to use for the same reason. Fitting this model gives the following results:
+The ACF plot indicates a 4 term moving average would be good to use since after a lag of 4 the time series appears like white noise, and the PACF plot indicates 1 AR term may be good to use for the same reason. Fitting this ARMA(1,4) model gives the following results:
 
 ```{r, echo=TRUE, warning=FALSE}
 
