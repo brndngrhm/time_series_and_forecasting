@@ -2,7 +2,7 @@
 title: "Time Series Project Proposal"
 author: "Brendan Graham"
 date: "February 24, 2016"
-output: word_document
+output: html_document
 ---
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE, include=FALSE}
@@ -34,7 +34,7 @@ library(ggthemes)
 ```
 
 
-A current project at my job consists of reviewing the use of socioeconomic data in airport forecasting practices, so I thought it would be interesting to develop an airport forecast using historical enplanements as well as income and employment data for the Philadelphia area ("Enplanement" is an industry term for boarding an aircraft). 
+A current project at my job consists of reviewing the use of socioeconomic data in airport forecasting practices, so I thought it would be interesting to develop an airport forecast of my own using historical enplanements as well as income and employment data for the Philadelphia area ("Enplanement" is an industry term for boarding an aircraft). 
 
 
 The data set I have consists of 104 monthly observations of enplanements, employment and income from 2007 to August 2015. The enplanement data is T-100 domestic market data from the Bureau of Transportation Statistics which consists of monthly enplanements by originating airport.^[http://www.transtats.bts.gov/DL_SelectFields.asp?Table_ID=310&DB_Short_Name=Air%20Carriers] The employment data is from the Current Employment Statistics (CES) program run by the Bureau of Labor Statistics and consists of not seasonally adjusted, non-farm employees for the Philadelphia Metropolitan Division.^[http://www.bls.gov/sae/] The earnings data also comes from CES and consists of average weekly earnings for private (non-governmental) employees for the Philadelphia Metropolitan Division, which I multiplied by 4 to estimate average monthly earnings.^[The Philadelphia Metropolitan Division is a sub-division of the Philadelphia-Camden-Wilmington Metropolitan Statistical Area]
