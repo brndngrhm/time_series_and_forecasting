@@ -2,7 +2,7 @@
 title: "Time Series Project Proposal"
 author: "Brendan Graham"
 date: "February 24, 2016"
-output: html_document
+output: pdf_document
 ---
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE, include=FALSE}
@@ -85,4 +85,4 @@ print(earn.plot)
 ```
 
 
-One of the aims of the project at my work is to explore if the use of socioeconomic data improves passenger forecasts, so I think it would be interesting to develop a forecast using only the historical data and then a second forecast using the historical data combined with the employment and earnings data and see if the model improves. Additionally, the FAA produces forecasts for each airport^[FAA Terminal Area Forecasts (TAF), http://tafpub.itworks-software.com/taf2014/TAF_AIRPORTSVIEW.asp?LOCID=PHL#], so it would be interesting to see how my forecast compares.
+One of the aims of the project at my work is to explore if the use of socioeconomic data improves passenger forecasts, so I think it would be interesting to develop a forecast using only the historical data and then a second forecast using the historical data combined with the employment and earnings data and see if the model improves. Additionally, the FAA produces forecasts for each airport^[FAA Terminal Area Forecasts (TAF), http://tafpub.itworks-software.com/taf2014/TAF_AIRPORTSVIEW.asp], so it would be interesting to see how my forecast compares.
