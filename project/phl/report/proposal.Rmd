@@ -38,7 +38,7 @@ library(ggthemes)
   theme(axis.text.x=element_text(size=12)) +
   theme(axis.text.y=element_text(size=12)) +
   theme(axis.title.y=element_text(size=20, vjust=1.5)) +
-  theme(axis.title.x=element_text(size=18, vjust=-.5))))
+  theme(axis.title.x=element_text(size=18, vjust=-.5)))
 
 (earn.plot <- ggplot(phl, aes(x=date, y=earnings)) + geom_point() + geom_line() + 
   labs(x= "", y= "Earnings\n", title = "PHL Monthly Earnings: 2007-2015\n") + 
@@ -48,7 +48,7 @@ library(ggthemes)
   theme(axis.text.x=element_text(size=12)) +
   theme(axis.text.y=element_text(size=12)) +
   theme(axis.title.y=element_text(size=20, vjust=1.5)) +
-  theme(axis.title.x=element_text(size=18, vjust=-.5))))
+  theme(axis.title.x=element_text(size=18, vjust=-.5)))
 
 ```
 
