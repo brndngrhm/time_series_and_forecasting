@@ -7,6 +7,8 @@ output: html_document
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE, include=FALSE}
 
+options(scipen=999) #removes scientific notation
+
 #for work
 load("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/phl.rda")
 
@@ -58,7 +60,10 @@ A current project at my job consists of reviewing the use of socioeconomic data 
 
 The data set I put together consists of 104 observations between January 2007 to August 2015 of 1) monthly enplanements at PHL, 2) monthly employment and 3) average monthly income. The enplanement data is T-100 domestic market data from the Bureau of Transportation Statistics which consists of monthly enplanements by originating airport.^[http://www.transtats.bts.gov/DL_SelectFields.asp?Table_ID=310&DB_Short_Name=Air%20Carriers] The employment data is from the Current Employment Statistics (CES) program run by the Bureau of Labor Statistics and consists of monthly, not-seasonally adjusted, non-farm employees for the Philadelphia Metropolitan Division.^[http://www.bls.gov/sae/] The earnings data also comes from the CES and consists of average weekly earnings for private (non-governmental) employees for the Philadelphia Metropolitan Division, which I multiplied by 4 to estimate average monthly earnings.^[The Philadelphia Metropolitan Division is a sub-division of the Philadelphia-Camden-Wilmington Metropolitan Statistical Area]
 
-The time series plot of historical monthly enplanements has a cyclical pattern evident of seasonality. It also shows a slight downward trend and heterogeneous variance across time. The employment time series also shows seasonality, and downward trend followed by an upward trend in recent years. The earnings data shows a positive trend and heterogeneous variance.
+The time series plot of historical monthly enplanements has a cyclical pattern evident of seasonality. It also shows a slight downward trend and heterogeneous variance across time. The employment time series also shows seasonality, and downward trend followed by an upward trend in recent years. The earnings data shows a positive trend and heterogeneous variance. 
+
+
+Another issue I may have to address is the differerence in scales among the three time series. Monthly enplanements range between `r format(round((as.numeric(min(phl$pax))), 2), big.mark=",", scientific=FALSE)` to `r format(round((as.numeric(max(phl$pax))), 2), big.mark=",", scientific=FALSE)` while monthly employment and earnings range from `r format(round((as.numeric(min(phl$emp))), 2), big.mark=",", scientific=FALSE)` to `r format(round((as.numeric(max(phl$emp))), 2), big.mark=",", scientific=FALSE)` and `r format(round((as.numeric(min(phl$earnings))), 2), big.mark=",", scientific=FALSE)` to `r format(round((as.numeric(max(phl$earnings))), 2), big.mark=",", scientific=FALSE)`, respectively.
 
 
 
