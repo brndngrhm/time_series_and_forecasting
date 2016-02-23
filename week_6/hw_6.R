@@ -30,3 +30,7 @@ acf2(diff)
 #fit
 
 sarima(wins2)
+
+
+#4
+
