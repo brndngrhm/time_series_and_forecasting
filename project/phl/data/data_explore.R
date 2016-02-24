@@ -83,9 +83,9 @@ acf(log.emp, main ='')
 acf(earnings2, main ='')
 
 #time series and acf plots of differenced data
-diff.log.pax <- diff(log.pax)
-diff.log.emp <- diff(log.emp)
-diff.earnings2 <- diff(earnings2)
+diff.log.pax <- diff(log.pax, differences=12)
+diff.log.emp <- diff(log.emp, differences=12)
+diff.earnings2 <- diff(earnings2, differences=12)
 par(mfrow = c(2, 3))
 plot(diff.log.pax, type = "o", main = "Diff Log Enplanements")
 plot(diff.log.emp, type = "o", main = "Diff Log Employment")
@@ -95,8 +95,31 @@ acf(log.emp, main ='')
 acf(earnings2, main ='')
 
 #acf and pacf plots of differenced data
-par(mfrow = c(2, 3))
-acf2(diff.log.pax)
-acf2(diff.log.emp)
-acf2(diff.earnings2)
+acf2(diff.log.pax, main = "Diff Log Enplanements")
+acf2(diff.log.emp, main = "Diff Log Employment")
+acf2(diff.earnings2, main = "Diff Earnings (000's")
 
+#ARMA models
+(model1 <- sarima(log.pax, 3, 0, 3, 0, 0, 0, S=12, details = FALSE))
+
+#aic matrices
+uplim=8
+aicmat.pax <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat[i+1,j+1]=arima(diff.log.pax,order=c(i,0,j))$aic}}
+aicmat.pax
+
+uplim=10
+aicmat.emp <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat[i+1,j+1]=arima(diff.log.emp,order=c(i,0,j))$aic}}
+aicmat.emp
+
+uplim=10
+aicmat.earn <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat[i+1,j+1]=arima(diff.earnings2,order=c(i,0,j))$aic}}
+aicmat.earn
