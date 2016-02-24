@@ -1,8 +1,8 @@
 ---
 title: "Brendan Graham HW 6 MAT8444"
-author: ""
+author: ''
 date: "February 24, 2016"
-output: html_document
+output: word_document
 ---
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE, include=FALSE}
@@ -44,7 +44,7 @@ aicmat
 ```
 
 
-3. A time series plot of the Phillies win percentage from 1901-2015 is shown in the plot below, along with ACF and PACF plots. The time series plot doesn't indicate a trend, and the ACF plot doesn't indicate much  seasonality, so no differencing seems necessary.
+3. A time series plot of the Phillies win percentage from 1901-2015 is shown in the plot below, along with ACF and PACF plots. The time series plot doesn't indicate much of a long term trend, so no differencing seems necessary.
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE}
 
@@ -85,15 +85,15 @@ model.2 <- sarima(wins2, 2, 0, 0, details=F)
 model.2
 ```
 
-This is my preferred model since it has fewer terms, a lower aic value and all of the diagnostic plots look the same or better. The only diagnostic plot that could be improved is the normal Q-Q plot, which currently shows some skewness, especially in the lower tail.
+This is my preferred model since it has fewer terms, a lower aic value and all of the diagnostic plots look the same or better. Looking at the estimates relative to the standard errors, the 2 coefficients seem significant. The only diagnostic plot that I think could be improved is the normal Q-Q plot, which currently shows some skewness, especially in the lower tail.
 
 The full equation for the model is X~t~ = 0.5295*X*~t-1~ + 0.1768*X*~t-2~ + *W*~t~.
 
 Using the model to predict the Phillies win percentage in 2016 indicates the win percentage will be 0.422 in 2016.
 
-```{r, echo = FALSE, warning=FALSE}
+```{r, echo, warning=FALSE}
 
-sarima.for(wins2, 1, 0, 0, 0, 2, 0, 0, 1)
+sarima.for(wins2, 1, 2, 0, 0, 0, 0, 0, 1)
 
 ```
 
