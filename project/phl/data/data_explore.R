@@ -29,6 +29,8 @@ load("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forec
    theme(text=element_text(family="Georgia")) + 
    scale_y_continuous(labels=comma))
 
+
+
 (emp.plot <- ggplot(phl, aes(x=date, y=emp)) + 
   geom_point() + geom_line() + 
   labs(x= "", y= "Employment\n", title = "PHL Monthly Employment: 2007-2015\n") + 
@@ -55,16 +57,46 @@ load("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forec
   scale_y_continuous(labels=comma))
 
 #formatting as time series ----
-phl.ts <- phl
-phl.ts[1] <- NULL
-phl.ts[1] <- NULL
-phl.ts[1] <- NULL
-phl.ts <- ts(phl.ts, frequency = 12)
 
-#base time series plots
-plot(phl.ts, type="o")
+#time series and acf plots
+pax <- ts(phl$pax, frequency = 12)
+emp <- ts(phl$emp, frequency = 12)
+earnings <- ts(phl$earnings, frequency = 12)
+par(mfrow = c(2, 3))
+plot(pax, type = "o", main = "Enplanements")
+plot(emp, type = "o", main = "Employment")
+plot(earnings, type = "o", main = "Earnings")
+acf(pax, main ='')
+acf(emp, main ='')
+acf(earnings, main ='')
 
-#acf plot amtrix
-acf(phl.ts)
+#time series and acf plots of transformed data
+log.pax <- ts(log(phl$pax), frequency = 12)
+log.emp <- ts(log(phl$emp), frequency = 12)
+earnings2 <- ts(phl$earnings/1000, frequency = 12)
+par(mfrow = c(2, 3))
+plot(log.pax, type = "o", main = "Log Enplanements")
+plot(log.emp, type = "o", main = "Log Employment")
+plot(earnings2, type = "o", main = "Earnings (000's")
+acf(log.pax, main ='')
+acf(log.emp, main ='')
+acf(earnings2, main ='')
 
+#time series and acf plots of differenced data
+diff.log.pax <- diff(log.pax)
+diff.log.emp <- diff(log.emp)
+diff.earnings2 <- diff(earnings2)
+par(mfrow = c(2, 3))
+plot(diff.log.pax, type = "o", main = "Diff Log Enplanements")
+plot(diff.log.emp, type = "o", main = "Diff Log Employment")
+plot(diff.earnings2, type = "o", main = "Diff Earnings (000's")
+acf(log.pax, main ='')
+acf(log.emp, main ='')
+acf(earnings2, main ='')
+
+#acf and pacf plots of differenced data
+par(mfrow = c(2, 3))
+acf2(diff.log.pax)
+acf2(diff.log.emp)
+acf2(diff.earnings2)
 
