@@ -112,4 +112,3 @@ plot(decompose(pax))
 plot(decompose(emp))
 plot(decompose(earnings))
 
-
