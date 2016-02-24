@@ -71,9 +71,9 @@ acf(emp, main ='')
 acf(earnings, main ='')
 
 #time series and acf plots of transformed data
-log.pax <- ts(log(phl$pax), frequency = 12)
-log.emp <- ts(log(phl$emp), frequency = 12)
-earnings2 <- ts(phl$earnings/1000, frequency = 12)
+log.pax <- log(pax)
+log.emp <- log(emp)
+earnings2 <- earnings/1000
 par(mfrow = c(2, 3))
 plot(log.pax, type = "o", main = "Log Enplanements")
 plot(log.emp, type = "o", main = "Log Employment")
@@ -94,32 +94,22 @@ acf(log.pax, main ='')
 acf(log.emp, main ='')
 acf(earnings2, main ='')
 
-#acf and pacf plots of differenced data
-acf2(diff.log.pax, main = "Diff Log Enplanements")
-acf2(diff.log.emp, main = "Diff Log Employment")
-acf2(diff.earnings2, main = "Diff Earnings (000's")
+#acf and pacf plots of  data
+acf2(pax, max.lag = 100)
+acf2(emp, max.lag = 100)
+acf2(earnings,max.lag = 100)
 
-#ARMA models
-(model1 <- sarima(log.pax, 3, 0, 3, 0, 0, 0, S=12, details = FALSE))
+acf2(log.pax, max.lag = 100)
+acf2(log.emp,max.lag = 100)
+acf2(earnings2, max.lag = 100)
 
-#aic matrices
-uplim=8
-aicmat.pax <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
-for (i in 0:uplim){
-  for (j in 0:uplim){
-    aicmat[i+1,j+1]=arima(diff.log.pax,order=c(i,0,j))$aic}}
-aicmat.pax
+acf2(diff.log.pax, max.lag = 90)
+acf2(diff.log.emp, max.lag = 90)
+acf2(diff.earnings2, max.lag = 90)
 
-uplim=10
-aicmat.emp <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
-for (i in 0:uplim){
-  for (j in 0:uplim){
-    aicmat[i+1,j+1]=arima(diff.log.emp,order=c(i,0,j))$aic}}
-aicmat.emp
+#decompisiton of data
+plot(decompose(pax))
+plot(decompose(emp))
+plot(decompose(earnings))
 
-uplim=10
-aicmat.earn <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
-for (i in 0:uplim){
-  for (j in 0:uplim){
-    aicmat[i+1,j+1]=arima(diff.earnings2,order=c(i,0,j))$aic}}
-aicmat.earn
+
