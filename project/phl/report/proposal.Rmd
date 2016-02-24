@@ -74,7 +74,7 @@ Another issue I may have to address is the differerence in scales among the thre
 
 
 
-```{r, echo = FALSE, fig.height=10, fig.width=10}
+```{r, echo = FALSE, fig.height=10, fig.width=12}
 
 print(pax.plot)
 
@@ -82,7 +82,7 @@ print(pax.plot)
 
 
 
-```{r, echo = FALSE, fig.height=10, fig.width=10}
+```{r, echo = FALSE, fig.height=10, fig.width=12}
 
 print(emp.plot)
 
@@ -90,7 +90,7 @@ print(emp.plot)
 
 
 
-```{r, echo = FALSE, fig.height=10, fig.width=10}
+```{r, echo = FALSE, fig.height=10, fig.width=12}
 
 print(earn.plot)
 
