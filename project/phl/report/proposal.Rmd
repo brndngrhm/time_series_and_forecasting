@@ -2,7 +2,7 @@
 title: "Time Series Project Proposal"
 author: "Brendan Graham"
 date: "February 24, 2016"
-output: html_document
+output: word_document
 ---
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE, include=FALSE}
