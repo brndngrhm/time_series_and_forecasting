@@ -29,8 +29,6 @@ load("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forec
    theme(text=element_text(family="Georgia")) + 
    scale_y_continuous(labels=comma))
 
-
-
 (emp.plot <- ggplot(phl, aes(x=date, y=emp)) + 
   geom_point() + geom_line() + 
   labs(x= "", y= "Employment\n", title = "PHL Monthly Employment: 2007-2015\n") + 
