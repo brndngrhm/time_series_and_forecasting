@@ -107,8 +107,3 @@ acf2(diff.log.pax, max.lag = 90)
 acf2(diff.log.emp, max.lag = 90)
 acf2(diff.earnings2, max.lag = 90)
 
-#decompisiton of data
-plot(decompose(pax))
-plot(decompose(emp))
-plot(decompose(earnings))
-
