@@ -34,3 +34,5 @@ sarima(wins2)
 
 #4
 
+p <-c(-9, 0, -4, 0, 1)
+polyroot(p)
