@@ -10,10 +10,10 @@ library(extrafont)
 
 #load data ----
 #for work
-load("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/phl.rda")
+#load("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/phl.rda")
 
 #for home
-#load("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.rda")
+load("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.rda")
 
 #some plots ----
 (pax.plot <- ggplot(phl, aes(x=date, y=pax)) + 
