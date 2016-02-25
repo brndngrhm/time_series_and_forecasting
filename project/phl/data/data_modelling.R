@@ -104,7 +104,11 @@ summary(lm2)
 
 #regression plus SARIMA Model ----
 
-lm <- lm(log.pax ~ log.emp + earnings2, data = phl)
+phl$year2 <- phl$year
+phl$year2 <- as.character(phl$year2)
+phl$year2 <- as.numeric(phl$year2)
+
+lm <- lm(log.pax ~ date + log.emp + earnings2, data = phl) #should I use date? or year? or month? or year as a number and not a factor?
 summary(lm)
 plot(lm)
 
