@@ -68,8 +68,18 @@ acf2(diff.pax, max.lag = 80)
 acf2(diff12.pax, max.lag = 80)
 
 #fitting a sarima model, sarima(data, p, d, q, P, D, Q, S, details = FALSE)
-(model.1 <- (sarima(pax, 1, 1, 2, 1, 0, 1, 12, detail = FALSE)))
+(model.1 <- (sarima(pax, 1, 1, 3, 1, 1, 1, 12, detail = FALSE)))
 
-#checking using aic matrix
+#checking using aic matrix8
 
+#forecasting
+sarima.for(pax, 120, 1, 1, 3, 1, 1, 1, 12)
 
+#comparing to TAF
+pred <- data.frame(sarima.for(pax, 120, 1, 1, 3, 1, 1, 1, 12)$pred)
+names(pred)[1] <- "pred"
+pred <- data.frame(tapply(pred$pred,cut(pred$pred,12),FUN=sum))
+names(pred)[1] <- "pred"
+pred$year <- c(2016:2027)
+
+taf <- 
