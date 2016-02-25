@@ -73,7 +73,8 @@ acf2(diff12.pax, max.lag = 80)
 #checking using aic matrix8
 
 #forecast
-sarima.for(pax, 120, 1, 1, 3, 1, 1, 1, 12)
+sarima.for(pax, 60, 1, 1, 3, 1, 1, 1, 12)
+
 
 #comparing to TAF
 pred <- data.frame(sarima.for(pax, 120, 1, 1, 3, 1, 1, 1, 12)$pred)
@@ -100,3 +101,27 @@ summary(lm1)
 
 lm2 <- lm(taf ~ year, data = pred)
 summary(lm2)
+
+#regression plus SARIMA Model ----
+
+lm <- lm(log.pax ~ log.emp + earnings2, data = phl)
+summary(lm)
+plot(lm)
+
+resids <- ts(lm$residuals, frequency=12)
+plot(resids, type="o")
+
+diff.resids <- diff(resids)
+plot(diff.resids, type="o")
+
+diff12.resids <- diff(diff.resids, 12)
+plot(diff12.resids, type="o")
+
+acf2(resids, max.lag = 100)
+acf2(diff.resids, max.lag=100)
+acf2(diff12.resids, max.lag = 90)
+
+(sarima.resids <- sarima(resids, 1, 1, 3, 1, 1, 1, 12, details = FALSE))
+
+lm.coeff <- data.frame(coefficients(lm))
+sarima.coeff <- data.frame(c(0.6295, -1.3205, 0.5266, -0.1664, 0.2012, -0.9990))
