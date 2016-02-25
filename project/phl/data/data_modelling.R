@@ -72,7 +72,7 @@ acf2(diff12.pax, max.lag = 80)
 
 #checking using aic matrix8
 
-#forecasting
+#forecast
 sarima.for(pax, 120, 1, 1, 3, 1, 1, 1, 12)
 
 #comparing to TAF
