@@ -102,7 +102,7 @@ summary(lm1)
 lm2 <- lm(taf ~ year, data = pred)
 summary(lm2)
 
-#regression plus SARIMA Model ----
+#regression with ARIMA Errors ----
 
 phl$year2 <- phl$year
 phl$year2 <- as.character(phl$year2)
