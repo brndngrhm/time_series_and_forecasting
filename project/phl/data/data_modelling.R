@@ -82,4 +82,13 @@ pred <- data.frame(tapply(pred$pred,cut(pred$pred,12),FUN=sum))
 names(pred)[1] <- "pred"
 pred$year <- c(2016:2027)
 
-taf <- 
+x.taf <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/taf.csv")
+taf <- read.csv(text = x.taf)
+
+pred <- left_join(pred, taf, by = "year")
+pred <- pred %>% select(year, pred, taf)
+
+pred.plot <- ggplot(pred, aes(year)) + 
+  geom_line(aes(y = pred, colour = "Prediction")) + 
+  geom_line(aes(y = taf, colour = "TAF"))
+
