@@ -17,10 +17,11 @@ load("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forec
 
 source("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/data_explore.R")
 
-# modelling pax alone
+# modelling pax alone ----
 
+#ts plot
 (pax.plot <- ggplot(phl, aes(x=date, y=pax)) + 
-  geom_point() + geom_line() + 
+  geom_point(aes(color = month, size=4)) + geom_line(aes(alpha = .5, size =2)) + scale_color_discrete()+
   labs(x= "", y= "Enplanements\n", title = "PHL Monthly Enplanements: 2007-2015\n") + 
   scale_x_datetime(breaks = date_breaks("1 year"), labels=date_format("%Y")) +
   theme(axis.text.x = element_text(angle = 90, vjust = .5)) + theme_hc()  +
@@ -32,17 +33,43 @@ source("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_for
   theme(text=element_text(family="Georgia")) + 
   scale_y_continuous(labels=comma))
 
-acf2(pax, main ='', max.lag = 100)
+#plot to check for trend, slight negative trend present
+(scatter.plot <- ggplot(phl, aes(x=date, y=pax)) + 
+  geom_point() + geom_smooth())
 
-log.diff.pax <- diff(log(pax), differences = 1)
-acf(diff.pax, lag = 100)
-acf2(diff.pax,  max.lag = 100)
+# differencing 1 round to remove trend and plotting both original and differenced data
+diff.pax <- diff(pax, differences = 1)
+par(mfrow = c(2, 1))
+plot(pax, type="o", main = "Original Data")
+plot(diff.pax, type="o", main = "Differenced Data")
 
-log.diff12.pax <- diff(log(pax), differences = 12)
-acf(diff12.pax, lag = 95)
-acf2(diff12.pax,  max.lag = 95)
+par(mfrow = c(2, 1))
+acf(pax, lag = 80)
+acf(diff.pax, lag = 80)
 
-(sarima(diff12.pax, 0, 1, 5, 2, 1, 2, 12))
-sarima()
+acf2(pax, max.lag = 80)
+acf2(diff.pax, max.lag = 80)
 
-sarima()
+#eliminating seasonal differences and plotting
+diff12.pax <- diff(diff.pax, 12)
+
+par(mfrow = c(3,1))
+plot(pax, type="o", main = "Original Data")
+plot(diff.pax, type="o", main = "Differenced Data")
+plot(diff12.pax, type="o", main = "Differenced (12) Data")
+
+par(mfrow = c(3, 1))
+acf(pax, lag = 80)
+acf(diff.pax, lag = 80)
+acf(diff12.pax, lag = 80)
+
+acf2(pax, max.lag = 80)
+acf2(diff.pax, max.lag = 80)
+acf2(diff12.pax, max.lag = 80)
+
+#fitting a sarima model, sarima(data, p, d, q, P, D, Q, S, details = FALSE)
+(model.1 <- (sarima(pax, 1, 1, 2, 1, 1, 1, 12, detail = FALSE)))
+
+#checking using aic matrix
+
+
