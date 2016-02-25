@@ -40,8 +40,8 @@ source("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_for
 # differencing 1 round to remove trend and plotting both original and differenced data
 diff.pax <- diff(pax, differences = 1)
 par(mfrow = c(2, 1))
-plot(pax, type="o", main = "Original Data")
-plot(diff.pax, type="o", main = "Differenced Data") #looks de-trended
+plot(pax, type="o", main = "Original Pax Data")
+plot(diff.pax, type="o", main = "Differenced Pax Data") #looks de-trended
 
 par(mfrow = c(2, 1))
 acf(pax, lag = 80)
@@ -54,9 +54,9 @@ acf2(diff.pax, max.lag = 80)
 diff12.pax <- diff(diff.pax, 12)
 
 par(mfrow = c(3,1))
-plot(pax, type="o", main = "Original Data")
-plot(diff.pax, type="o", main = "Differenced Data")
-plot(diff12.pax, type="o", main = "Differenced (12) Data")
+plot(pax, type="o", main = "Original Pax Data")
+plot(diff.pax, type="o", main = "Differenced Pax Data")
+plot(diff12.pax, type="o", main = "Seasonally Differenced (12)  Pax Data")
 
 par(mfrow = c(3, 1))
 acf(pax, lag = 80)
