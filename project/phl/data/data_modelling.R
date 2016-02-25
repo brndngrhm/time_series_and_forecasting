@@ -17,7 +17,7 @@ load("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forec
 
 source("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/data_explore.R")
 
-#modelling pax alone ----
+#modelling pax alone using SARIMA ----
 
 #ts plot
 (pax.plot <- ggplot(phl, aes(x=date, y=pax)) + 
