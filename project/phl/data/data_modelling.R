@@ -88,7 +88,15 @@ taf <- read.csv(text = x.taf)
 pred <- left_join(pred, taf, by = "year")
 pred <- pred %>% select(year, pred, taf)
 
-pred.plot <- ggplot(pred, aes(year)) + 
-  geom_line(aes(y = pred, colour = "Prediction")) + 
-  geom_line(aes(y = taf, colour = "TAF"))
+(pred.plot <- ggplot(pred, aes(year)) + 
+  geom_line(aes(y = pred/1000000, colour = "Prediction")) + 
+  geom_line(aes(y = taf/1000000, colour = "TAF")) + coord_fixed(ratio=1))
 
+(pred.scatter <- ggplot(pred, aes(x=year, y=pred/1000000)) + geom_point() + geom_smooth(se = FALSE, method = lm)) +coord_fixed(ratio = 1)
+(taf.scatter <- ggplot(pred, aes(x=year, y=taf/1000000)) + geom_point() + geom_smooth(se = FALSE, method = lm))
+
+lm1 <- lm(pred ~ year, data = pred)
+summary(lm1)
+
+lm2 <- lm(taf ~ year, data = pred)
+summary(lm2)
