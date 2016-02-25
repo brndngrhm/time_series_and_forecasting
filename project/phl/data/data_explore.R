@@ -80,10 +80,10 @@ acf(log.pax, main ='')
 acf(log.emp, main ='')
 acf(earnings2, main ='')
 
-#time series and acf plots of differenced data
-diff.log.pax <- diff(log.pax, differences=12)
-diff.log.emp <- diff(log.emp, differences=12)
-diff.earnings2 <- diff(earnings2, differences=12)
+#time series and acf plots of differenced data to remove trend
+diff.log.pax <- diff(log.pax)
+diff.log.emp <- diff(log.emp)
+diff.earnings2 <- diff(earnings2)
 par(mfrow = c(2, 3))
 plot(diff.log.pax, type = "o", main = "Diff Log Enplanements")
 plot(diff.log.emp, type = "o", main = "Diff Log Employment")
@@ -92,7 +92,19 @@ acf(log.pax, main ='')
 acf(log.emp, main ='')
 acf(earnings2, main ='')
 
-#acf and pacf plots of  data
+#time series and acf plots of differenced data to remove seasonality
+diff12.log.pax <- diff(diff.log.pax, 12)
+diff12.log.emp <- diff(diff.log.emp, 12)
+diff12.earnings2 <- diff(diff.earnings2, 12)
+par(mfrow = c(2, 3))
+plot(diff12.log.pax, type = "o", main = "Diff(12) Log Enplanements")
+plot(diff12.log.emp, type = "o", main = "Diff(12) Log Employment")
+plot(diff12.earnings2, type = "o", main = "Diff(12) Earnings (000's")
+acf(diff12.log.pax, main ='')
+acf(diff12.log.emp, main ='')
+acf(diff12.earnings2, main ='')
+
+#acf and pacf plots of data, original, transformed, differnced 1, differenced 12
 acf2(pax, max.lag = 100)
 acf2(emp, max.lag = 100)
 acf2(earnings,max.lag = 100)
@@ -105,3 +117,6 @@ acf2(diff.log.pax, max.lag = 90)
 acf2(diff.log.emp, max.lag = 90)
 acf2(diff.earnings2, max.lag = 90)
 
+acf2(diff12.log.pax, max.lag = 90)
+acf2(diff12.log.emp, max.lag = 90)
+acf2(diff12.earnings2, max.lag = 90)
