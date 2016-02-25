@@ -17,7 +17,7 @@ load("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forec
 
 source("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/data_explore.R")
 
-# modelling pax alone ----
+#modelling pax alone ----
 
 #ts plot
 (pax.plot <- ggplot(phl, aes(x=date, y=pax)) + 
@@ -73,7 +73,7 @@ acf2(diff12.pax, max.lag = 80)
 #checking using aic matrix8
 
 #forecast
-sarima.for(pax, 60, 1, 1, 3, 1, 1, 1, 12)
+sarima.for(pax, 120, 1, 1, 3, 1, 1, 1, 12)
 
 
 #comparing to TAF
@@ -108,7 +108,7 @@ phl$year2 <- phl$year
 phl$year2 <- as.character(phl$year2)
 phl$year2 <- as.numeric(phl$year2)
 
-lm <- lm(log.pax ~ date + log.emp + earnings2, data = phl) #should I use date? or year? or month? or year as a number and not a factor?
+lm <- lm(pax ~ time(month) + emp + earnings, data = phl) #should I use date? or year? or month? need to format as time(year) or ts(month)?
 summary(lm)
 plot(lm)
 
