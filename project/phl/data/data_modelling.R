@@ -75,7 +75,7 @@ acf2(diff12.pax, max.lag = 80)
 #forecasting
 sarima.for(pax, 120, 1, 1, 3, 1, 1, 1, 12)
 
-#comparing to TAF ----
+#comparing to TAF
 pred <- data.frame(sarima.for(pax, 120, 1, 1, 3, 1, 1, 1, 12)$pred)
 names(pred)[1] <- "pred"
 pred <- data.frame(tapply(pred$pred,cut(pred$pred,12),FUN=sum))
