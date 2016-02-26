@@ -67,13 +67,34 @@ acf2(pax, max.lag = 80)
 acf2(diff.pax, max.lag = 80)
 acf2(diff12.pax, max.lag = 80)
 
-#fitting a sarima model, sarima(data, p, d, q, P, D, Q, S, details = FALSE)
-(model.1 <- (sarima(pax, 1, 1, 3, 1, 1, 1, 12, detail = FALSE)))
+#fitting a sarima modelbased on acf & pacf plots, sarima(data, p, d, q, P, D, Q, S, details = FALSE)
+(model.1 <- (sarima(pax, 2, 1, 3, 0, 1, 1, 12, detail = FALSE)))
 
-#checking using aic matrix8
+#trying log(pax), fit seems betterand aic is lower
+(model.1a <- (sarima(log(pax), 2, 1, 3, 0, 1, 1, 12, detail = FALSE)))
+
+#checking seasonal and other part fit using aic matrix, row=AR=P, col=MA=Q
+uplim=4
+aicmat.pax <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat.pax[i+1,j+1]=sarima(log(pax),0,1,0,i,1,j,12,details=F,tol=0.001)$AIC
+    print(aicmat.pax)}}
+
+(model.1b <- (sarima(log(pax), 0, 1, 0, 0, 1, 1, 12, detail = FALSE)))
+
+aicmat.pax2 <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat.pax2[i+1,j+1]<-sarima(log(pax), i, 1, j, 0, 1, 1, 12, details=F, tol=0.001)$AIC
+    print(aicmat.pax)}}
+
+#fitting 2nd sarima model, sarima(data, p, d, q, P, D, Q, S, details = FALSE)
+(model.2 <- (sarima(log(pax), 0, 1, 3, 1, 1, 4, 12, detail = FALSE)))
+(model.1a <- (sarima(log(pax), 2, 1, 3, 0, 1, 1, 12, detail = FALSE)))
 
 #forecast
-sarima.for(pax, 120, 1, 1, 3, 1, 1, 1, 12)
+sarima.for(log(pax), 120, 2, 1, 3, 0, 1, 1, 12)
 
 
 #comparing to TAF
@@ -93,8 +114,8 @@ pred <- pred %>% select(year, pred, taf)
   geom_line(aes(y = pred/1000000, colour = "Prediction")) + 
   geom_line(aes(y = taf/1000000, colour = "TAF")) + coord_fixed(ratio=1))
 
-(pred.scatter <- ggplot(pred, aes(x=year, y=pred/1000000)) + geom_point() + geom_smooth(se = FALSE, method = lm)) +coord_fixed(ratio = 1)
-(taf.scatter <- ggplot(pred, aes(x=year, y=taf/1000000)) + geom_point() + geom_smooth(se = FALSE, method = lm))
+(pred.scatter <- ggplot(pred, aes(x=year, y=pred/1000000)) + geom_point() + geom_smooth(se = FALSE, method = "lm")) +coord_fixed(ratio = 1)
+(taf.scatter <- ggplot(pred, aes(x=year, y=taf/1000000)) + geom_point() + geom_smooth(se = FALSE, method = "lm"))
 
 lm1 <- lm(pred ~ year, data = pred)
 summary(lm1)
@@ -108,7 +129,7 @@ phl$year2 <- phl$year
 phl$year2 <- as.character(phl$year2)
 phl$year2 <- as.numeric(phl$year2)
 
-lm <- lm(pax ~ time(month) + emp + earnings, data = phl) #should I use date? or year? or month? need to format as time(year) or ts(month)?
+lm <- lm(log(pax) ~ time(month) + log(emp) + earnings/1000, data = phl) #should I use date? or year? or month? need to format as time(year) or ts(month)?
 summary(lm)
 plot(lm)
 
@@ -125,7 +146,7 @@ acf2(resids, max.lag = 100)
 acf2(diff.resids, max.lag=100)
 acf2(diff12.resids, max.lag = 90)
 
-(sarima.resids <- sarima(resids, 1, 1, 3, 1, 1, 1, 12, details = FALSE))
+(sarima.resids <- sarima(resids, 1, 1, 3, 1, 1, 0, 12, details = FALSE))
 
 lm.coeff <- data.frame(coefficients(lm))
 sarima.coeff <- data.frame(c(0.6295, -1.3205, 0.5266, -0.1664, 0.2012, -0.9990))
