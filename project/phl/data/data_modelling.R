@@ -7,6 +7,10 @@ library(scales)
 library(astsa)
 library(ggthemes)
 library(extrafont)
+library(tidyr)
+library(reshape)
+library(RCurl)
+library(rvest)
 
 #load data and exploration script ----
 #for work
@@ -99,29 +103,32 @@ sarima.for(log(pax), 120, 2, 1, 3, 0, 1, 1, 12)
 
 #comparing to TAF
 pred <- data.frame(sarima.for(pax, 120, 1, 1, 3, 1, 1, 1, 12)$pred)
-names(pred)[1] <- "pred"
-pred <- data.frame(tapply(pred$pred,cut(pred$pred,12),FUN=sum))
-names(pred)[1] <- "pred"
+names(pred)[1] <- "Prediction"
+pred <- data.frame(tapply(pred$Prediction,cut(pred$Prediction,12),FUN=sum))
+names(pred)[1] <- "Prediction"
 pred$year <- c(2016:2027)
 
 x.taf <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/taf.csv")
-taf <- read.csv(text = x.taf)
+TAF <- read.csv(text = x.taf)
+names(TAF)[2] <- "TAF"
 
-pred <- left_join(pred, taf, by = "year")
-pred <- pred %>% select(year, pred, taf)
+pred <- left_join(pred, TAF, by = "year")
+pred <- pred %>% select(year, Prediction, TAF)
 
-(pred.plot <- ggplot(pred, aes(year)) + 
-  geom_line(aes(y = pred/1000000, colour = "Prediction")) + 
-  geom_line(aes(y = taf/1000000, colour = "TAF")) + coord_fixed(ratio=1))
+pred <-  melt(pred, id.vars = c("year"))
 
-(pred.scatter <- ggplot(pred, aes(x=year, y=pred/1000000)) + geom_point() + geom_smooth(se = FALSE, method = "lm")) +coord_fixed(ratio = 1)
-(taf.scatter <- ggplot(pred, aes(x=year, y=taf/1000000)) + geom_point() + geom_smooth(se = FALSE, method = "lm"))
-
-lm1 <- lm(pred ~ year, data = pred)
-summary(lm1)
-
-lm2 <- lm(taf ~ year, data = pred)
-summary(lm2)
+(pred.plot <- ggplot(pred, aes(x=year, y=value, color = variable)) + 
+  geom_point(size=3, alpha = .8) + geom_smooth(method="lm", se = FALSE) + 
+  labs(x = "\nYear", y="Forecast Enplanements\n", title = "Forecast Comparison") + 
+  theme_hc() + scale_color_tableau() + 
+  theme(plot.title=element_text(size=22)) +
+  theme(axis.text.x=element_text(size=16)) +
+  theme(axis.text.y=element_text(size=16)) +
+  theme(axis.title.y=element_text(size=20, vjust=1.5)) +
+  theme(axis.title.x=element_text(size=18, vjust=-.5)) + 
+  theme(text=element_text(family="Georgia")) + 
+  scale_y_continuous(labels=comma) + 
+  theme(legend.position = "right") + theme(legend.title = element_blank()))
 
 #regression with ARIMA Errors ----
 
@@ -129,11 +136,15 @@ phl$year2 <- phl$year
 phl$year2 <- as.character(phl$year2)
 phl$year2 <- as.numeric(phl$year2)
 
-lm <- lm(log(pax) ~ time(month) + log(emp) + earnings/1000, data = phl) #should I use date? or year? or month? need to format as time(year) or ts(month)?
+lm <- lm(pax~ ts(month) + emp + earnings, data = phl) #should I use date? or year? or month? need to format as time(year) or ts(month)?
 summary(lm)
 plot(lm)
 
-resids <- ts(lm$residuals, frequency=12)
+lm2 <-  lm(pax~ ts(month) + earnings, data = phl) #should I use date? or year? or month? need to format as time(year) or ts(month)?
+summary(lm2)
+plot(lm2)
+
+resids <- ts(lm2$residuals, frequency=12)
 plot(resids, type="o")
 
 diff.resids <- diff(resids)
@@ -146,7 +157,7 @@ acf2(resids, max.lag = 100)
 acf2(diff.resids, max.lag=100)
 acf2(diff12.resids, max.lag = 90)
 
-(sarima.resids <- sarima(resids, 1, 1, 3, 1, 1, 0, 12, details = FALSE))
+(sarima.resids <- sarima(resids, 1, 1, 3, 0, 1, 1, 12, details = FALSE))
 
 lm.coeff <- data.frame(coefficients(lm))
 sarima.coeff <- data.frame(c(0.6295, -1.3205, 0.5266, -0.1664, 0.2012, -0.9990))
