@@ -189,5 +189,3 @@ fit <- auto.arima(phl$pax, xreg=cbind(phl$emp,phl$earnings))
 summary(fit)
 plot(fit)
 
-
-
