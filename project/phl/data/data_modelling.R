@@ -11,6 +11,7 @@ library(tidyr)
 library(reshape)
 library(RCurl)
 library(rvest)
+library(forecast)
 
 #load data and exploration script ----
 #for work
@@ -140,8 +141,7 @@ pred <-  melt(pred, id.vars = c("year"))
 pairs(phl[, 3:6])
 
 #regression model 1: t = β0 + β1t + β2xt+ β2xt + ϵt 
-
-lm <- lm(log(pax) ~ time(month) + log(emp) + earnings2, data = phl) #should I use date? or year? or month? need to format as time(year) or ts(month)?
+lm <- lm(pax ~ (month) + emp + earnings) #should I use date? or year? or month? need to format as time(year) or ts(month)?
 summary(lm)
 plot(lm)
 
@@ -183,4 +183,11 @@ for (i in 0:uplim){
 
 #fitting 2nd sariam model, think 1st one is better
 (sarima.resids2 <- sarima(resids, 1, 1, 2, 0, 1, 2, 12, details = FALSE))
+
+
+fit <- auto.arima(phl$pax, xreg=cbind(phl$emp,phl$earnings))
+summary(fit)
+plot(fit)
+
+
 
