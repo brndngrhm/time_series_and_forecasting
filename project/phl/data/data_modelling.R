@@ -61,7 +61,7 @@ diff12.pax <- diff(diff.pax, 12)
 par(mfrow = c(3,1))
 plot(pax, type="o", main = "Original Pax Data")
 plot(diff.pax, type="o", main = "Differenced Pax Data")
-plot(diff12.pax, type="o", main = "Seasonally Differenced (12)  Pax Data")
+plot(diff12.pax, type="o", main = "Seasonally Differenced (12) Pax Data")
 
 par(mfrow = c(3, 1))
 acf(pax, lag = 80)
@@ -101,9 +101,8 @@ for (i in 0:uplim){
 #forecast
 sarima.for(log(pax), 120, 2, 1, 3, 0, 1, 1, 12)
 
-
 #comparing to TAF
-pred <- data.frame(sarima.for(pax, 120, 1, 1, 3, 1, 1, 1, 12)$pred)
+pred <- data.frame(exp(sarima.for(log(pax), 120, 1, 1, 3, 1, 1, 1, 12)$pred)) #need to exponentiate??
 names(pred)[1] <- "Prediction"
 pred <- data.frame(tapply(pred$Prediction,cut(pred$Prediction,12),FUN=sum))
 names(pred)[1] <- "Prediction"
@@ -115,10 +114,14 @@ names(TAF)[2] <- "TAF"
 
 pred <- left_join(pred, TAF, by = "year")
 pred <- pred %>% select(year, Prediction, TAF)
+pred$diff <- pred$Prediction - pred$TAF
+sum(pred$diff)
 
-pred <-  melt(pred, id.vars = c("year"))
+pred2 <- pred
+pred2[4] <- NULL
+pred2 <- melt(pred2, id.vars = c("year"))
 
-(pred.plot <- ggplot(pred, aes(x=year, y=value, color = variable)) + 
+(pred.plot <- ggplot(pred2, aes(x=year, y=value, color = variable)) + 
   geom_point(size=3, alpha = .8) + geom_smooth(method="lm", se = FALSE) + 
   labs(x = "\nYear", y="Forecast Enplanements\n", title = "Forecast Comparison") + 
   theme_hc() + scale_color_tableau() + 
@@ -188,4 +191,3 @@ for (i in 0:uplim){
 fit <- auto.arima(phl$pax, xreg=cbind(phl$emp,phl$earnings))
 summary(fit)
 plot(fit)
-
