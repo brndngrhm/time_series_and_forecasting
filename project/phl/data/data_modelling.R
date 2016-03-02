@@ -118,8 +118,8 @@ pred$diff <- pred$Prediction - pred$TAF
 sum(pred$diff)
 
 pred2 <- pred
-pred2[4] <- NULL
-pred2 <- melt(pred2, id.vars = c("year"))
+pred2[3] <- NULL
+pred2 <- melt(pred, id.vars = c("year"))
 
 (pred.plot <- ggplot(pred2, aes(x=year, y=value, color = variable)) + 
   geom_point(size=3, alpha = .8) + geom_smooth(method="lm", se = FALSE) + 
