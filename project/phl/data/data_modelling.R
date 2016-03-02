@@ -132,18 +132,25 @@ pred <-  melt(pred, id.vars = c("year"))
 
 #regression with ARIMA Errors ----
 
-phl$year2 <- phl$year
-phl$year2 <- as.character(phl$year2)
-phl$year2 <- as.numeric(phl$year2)
+#scatterplot to check for trend, slight negative trend present
+(scatter.plot <- ggplot(phl, aes(x=date, y=log(pax))) + 
+   geom_point() + geom_smooth())
 
-lm <- lm(pax~ ts(month) + emp + earnings, data = phl) #should I use date? or year? or month? need to format as time(year) or ts(month)?
+#scatterplot matrix
+pairs(phl[, 3:6])
+
+#regression model 1: t = β0 + β1t + β2xt+ β2xt + ϵt 
+
+lm <- lm(log(pax) ~ time(month) + log(emp) + earnings2, data = phl) #should I use date? or year? or month? need to format as time(year) or ts(month)?
 summary(lm)
 plot(lm)
 
+#reggression model 2
 lm2 <-  lm(pax~ ts(month) + earnings, data = phl) #should I use date? or year? or month? need to format as time(year) or ts(month)?
 summary(lm2)
 plot(lm2)
 
+#saving residuals, plotting, differencing and plotting acf/pacf
 resids <- ts(lm2$residuals, frequency=12)
 plot(resids, type="o")
 
@@ -157,7 +164,23 @@ acf2(resids, max.lag = 100)
 acf2(diff.resids, max.lag=100)
 acf2(diff12.resids, max.lag = 90)
 
+#initial residual model
 (sarima.resids <- sarima(resids, 1, 1, 3, 0, 1, 1, 12, details = FALSE))
 
-lm.coeff <- data.frame(coefficients(lm))
-sarima.coeff <- data.frame(c(0.6295, -1.3205, 0.5266, -0.1664, 0.2012, -0.9990))
+#checking number of seasonal terms
+aicmat.resids <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat.resids[i+1,j+1]<-sarima(diff12.resids, 0, 1, 0, i, 1, j, 12, details=F, tol=0.001)$AIC
+    print(aicmat.resids)}}
+
+#checking number of other terms
+aicmat.resids2 <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat.resids2[i+1,j+1]<-sarima(diff12.resids, i, 1, j, 0, 1, 2, 12, details=F, tol=0.001)$AIC
+    print(aicmat.resids2)}}
+
+#fitting 2nd sariam model, think 1st one is better
+(sarima.resids2 <- sarima(resids, 1, 1, 2, 0, 1, 2, 12, details = FALSE))
+
