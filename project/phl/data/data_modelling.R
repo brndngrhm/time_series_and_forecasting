@@ -128,7 +128,7 @@ pred <- pred %>% select(year, Prediction, TAF)
 
 pred2 <- melt(pred, id.vars = "year", measure.vars = c("Prediction", "TAF"))
 
-(pred.plot <- ggplot(pred2, aes(x=year, y=Prediction,) + 
+(pred.plot <- ggplot(pred2, aes(x=year, y=Prediction, color = Value) + 
   geom_point(size=3, alpha = .8) + geom_smooth(method="lm", se = FALSE) + 
   labs(x = "\nYear", y="Forecast Enplanements\n", title = "Forecast Comparison") + 
   theme_hc() + scale_color_tableau() + 
@@ -139,7 +139,7 @@ pred2 <- melt(pred, id.vars = "year", measure.vars = c("Prediction", "TAF"))
   theme(axis.title.x=element_text(size=18, vjust=-.5)) + 
   theme(text=element_text(family="Georgia")) + 
   scale_y_continuous(labels=comma) + 
-  theme(legend.position = "right") + theme(legend.title = element_blank()))
+  theme(legend.position = "right") + theme(legend.title = element_blank())))
 
 #regression with ARIMA Errors ----
 
