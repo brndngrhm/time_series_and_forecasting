@@ -56,7 +56,7 @@ load("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forec
 
 #formatting as time series ----
 
-#time series and acf plots
+#time series and acf plots of pax, emp, earnings
 pax <- ts(phl$pax, frequency = 12)
 emp <- ts(phl$emp, frequency = 12)
 earnings <- ts(phl$earnings, frequency = 12)
@@ -68,7 +68,7 @@ acf(pax, main ='')
 acf(emp, main ='')
 acf(earnings, main ='')
 
-#time series and acf plots of transformed data
+#time series and acf plots of transformed data (log pax, emp, earnings)
 log.pax <- log(pax)
 log.emp <- log(emp)
 earnings2 <- earnings/1000
