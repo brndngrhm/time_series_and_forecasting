@@ -102,26 +102,33 @@ for (i in 0:uplim){
 sarima.for(log(pax), 120, 2, 1, 3, 0, 1, 1, 12)
 
 #comparing to TAF
-pred <- data.frame(exp(sarima.for(log(pax), 120, 1, 1, 3, 1, 1, 1, 12)$pred)) #need to exponentiate??
+pred <- as.data.frame(as.numeric(exp(sarima.for(log(pax), 120, 1, 1, 3, 1, 1, 1, 12)$pred))) # do i need to exponentiate??
 names(pred)[1] <- "Prediction"
-pred <- data.frame(tapply(pred$Prediction,cut(pred$Prediction,12),FUN=sum))
-names(pred)[1] <- "Prediction"
-pred$year <- c(2016:2027)
+pred$year <- c(1,1,1,1,1,1,1,1,1,1,1,1,
+                2,2,2,2,2,2,2,2,2,2,2,2,
+                3,3,3,3,3,3,3,3,3,3,3,3,
+                4,4,4,4,4,4,4,4,4,4,4,4,
+                5,5,5,5,5,5,5,5,5,5,5,5,
+                6,6,6,6,6,6,6,6,6,6,6,6,
+                7,7,7,7,7,7,7,7,7,7,7,7,
+                8,8,8,8,8,8,8,8,8,8,8,8,
+                9,9,9,9,9,9,9,9,9,9,9,9,
+                10,10,10,10,10,10,10,10,10,10,10,10)
+pred <- pred %>% select(Prediction, year) %>% group_by(year) %>% summarise(Prediction = sum(Prediction))
+pred[1] <- NULL
+pred$year <- c(2016:2025)
 
 x.taf <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/taf.csv")
 TAF <- read.csv(text = x.taf)
 names(TAF)[2] <- "TAF"
+TAF <- as.data.frame(TAF %>% filter(year <= 2025))
 
 pred <- left_join(pred, TAF, by = "year")
 pred <- pred %>% select(year, Prediction, TAF)
-pred$diff <- pred$Prediction - pred$TAF
-sum(pred$diff)
 
-pred2 <- pred
-pred2[3] <- NULL
-pred2 <- melt(pred, id.vars = c("year"))
+pred2 <- melt(pred, id.vars = "year", measure.vars = c("Prediction", "TAF"))
 
-(pred.plot <- ggplot(pred2, aes(x=year, y=value, color = variable)) + 
+(pred.plot <- ggplot(pred2, aes(x=year, y=Prediction,) + 
   geom_point(size=3, alpha = .8) + geom_smooth(method="lm", se = FALSE) + 
   labs(x = "\nYear", y="Forecast Enplanements\n", title = "Forecast Comparison") + 
   theme_hc() + scale_color_tableau() + 
