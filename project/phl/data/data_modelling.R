@@ -151,12 +151,12 @@ pred2 <- melt(pred, id.vars = "year", measure.vars = c("Prediction", "TAF"))
 #scatterplot matrix
 pairs(phl[, 3:6])
 
-#regression model 1: t = β0 + β1t + β2xt+ β2xt + ϵt 
+#regression model: t = β0 + β1t + β2xt+ β2xt + ϵt 
 t <- seq(2007, 2015.583, by=1/12)
 t2 <- t*t
 phl$month2 <- month(phl$date)
 
-lm <- lm(pax ~ t + t2 + factor(month2) + emp + earnings, data=subset(phl, date <= "2015-07-01")) #should I use date? or year? or month? need to format as time(year) or ts(month)?
+lm <- lm(log(pax) ~ t + t2 + factor(month2) + log(emp) + earnings/1000, data=subset(phl, date <= "2015-07-01")) #should I use date? or year? or month? need to format as time(year) or ts(month)?
 summary(lm)
 plot(lm)
 
@@ -171,26 +171,47 @@ acf2(diff.resids)
 
 diff12.resids <- diff(diff.resids, 12)
 plot(diff12.resids, type="o")
-acf2(diff12.resids, max.lag = 90)
+acf2(diff12.resids, max.lag = 85)
 
 #initial residual model
 (sarima.resids <- sarima(resids, 1, 1, 3, 0, 1, 1, 12, details = FALSE))
 
 #checking number of seasonal terms
+uplim=4
 aicmat.resids <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
 for (i in 0:uplim){
   for (j in 0:uplim){
     aicmat.resids[i+1,j+1]<-sarima(resids, 0, 1, 0, i, 1, j, 12, details=F, tol=0.001)$AIC
     print(aicmat.resids)}}
 
+which.min(aicmat.resids) #suggests AR(1), MA(4)
+
 #checking number of other terms
+uplim=4
 aicmat.resids2 <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
 for (i in 0:uplim){
   for (j in 0:uplim){
-    aicmat.resids2[i+1,j+1]<-sarima(resids, i, 1, j, 0, 1, 1, 12, details=F, tol=0.001)$AIC
+    aicmat.resids2[i+1,j+1]<-sarima(resids, i, 1, j, 1, 1, 4, 12, details=F, tol=0.001)$AIC
     print(aicmat.resids2)}}
 
+which.min(aicmat.resids2)
+
 #fitting 2nd sariam model, think 1st one is better
-(sarima.resids2 <- sarima(resids, 0, 1, 1, 0, 1, 1, 12, details = FALSE))
+(sarima.resids2 <- sarima(resids, 4, 1, 2, 1, 1, 4, 12, details = FALSE))
 
 
+
+beta <- lm$coefficients
+xmat <- matrix(double(103*16), 103, 16)
+W
+xmat[1,4]=1
+xmat[2,5]=1
+xmat[3,6]=1
+xmat[4,7]=1
+xmat[5,8]=1
+xmat[6,9]=1
+xmat[7,10]=1
+xmat[8,11]=1
+xmat[9,12]=1
+xmat[10,13]=1
+xmat[11,14]=1
