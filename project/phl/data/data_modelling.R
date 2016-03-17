@@ -12,6 +12,7 @@ library(reshape)
 library(RCurl)
 library(rvest)
 library(forecast)
+library(lubridate)
 
 #load data and exploration script ----
 #for work
@@ -151,27 +152,25 @@ pred2 <- melt(pred, id.vars = "year", measure.vars = c("Prediction", "TAF"))
 pairs(phl[, 3:6])
 
 #regression model 1: t = β0 + β1t + β2xt+ β2xt + ϵt 
-lm <- lm(pax ~ (month) + emp + earnings) #should I use date? or year? or month? need to format as time(year) or ts(month)?
+t <- seq(2007, 2015.583, by=1/12)
+t2 <- t*t
+phl$month2 <- month(phl$date)
+
+lm <- lm(pax ~ t + t2 + factor(month2) + emp + earnings, data=subset(phl, date <= "2015-07-01")) #should I use date? or year? or month? need to format as time(year) or ts(month)?
 summary(lm)
 plot(lm)
 
-#reggression model 2
-lm2 <-  lm(pax~ ts(month) + earnings, data = phl) #should I use date? or year? or month? need to format as time(year) or ts(month)?
-summary(lm2)
-plot(lm2)
-
 #saving residuals, plotting, differencing and plotting acf/pacf
-resids <- ts(lm2$residuals, frequency=12)
+resids <- (lm$residuals)
 plot(resids, type="o")
+acf2(resids)
 
 diff.resids <- diff(resids)
-plot(diff.resids, type="o")
+plot(lm$residuals, type="l")
+acf2(diff.resids)
 
 diff12.resids <- diff(diff.resids, 12)
 plot(diff12.resids, type="o")
-
-acf2(resids, max.lag = 100)
-acf2(diff.resids, max.lag=100)
 acf2(diff12.resids, max.lag = 90)
 
 #initial residual model
@@ -181,20 +180,17 @@ acf2(diff12.resids, max.lag = 90)
 aicmat.resids <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
 for (i in 0:uplim){
   for (j in 0:uplim){
-    aicmat.resids[i+1,j+1]<-sarima(diff12.resids, 0, 1, 0, i, 1, j, 12, details=F, tol=0.001)$AIC
+    aicmat.resids[i+1,j+1]<-sarima(resids, 0, 1, 0, i, 1, j, 12, details=F, tol=0.001)$AIC
     print(aicmat.resids)}}
 
 #checking number of other terms
 aicmat.resids2 <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
 for (i in 0:uplim){
   for (j in 0:uplim){
-    aicmat.resids2[i+1,j+1]<-sarima(diff12.resids, i, 1, j, 0, 1, 2, 12, details=F, tol=0.001)$AIC
+    aicmat.resids2[i+1,j+1]<-sarima(resids, i, 1, j, 0, 1, 1, 12, details=F, tol=0.001)$AIC
     print(aicmat.resids2)}}
 
 #fitting 2nd sariam model, think 1st one is better
-(sarima.resids2 <- sarima(resids, 1, 1, 2, 0, 1, 2, 12, details = FALSE))
+(sarima.resids2 <- sarima(resids, 0, 1, 1, 0, 1, 1, 12, details = FALSE))
 
 
-fit <- auto.arima(phl$pax, xreg=cbind(phl$emp,phl$earnings))
-summary(fit)
-plot(fit)
