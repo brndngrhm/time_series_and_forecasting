@@ -7,6 +7,12 @@ library(scales)
 library(astsa)
 library(ggthemes)
 library(extrafont)
+library(tidyr)
+library(reshape)
+library(RCurl)
+library(rvest)
+library(forecast)
+library(lubridate)
 
 #load data and exploration script ----
 #for work
@@ -40,8 +46,8 @@ source("C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_for
 # differencing 1 round to remove trend and plotting both original and differenced data
 diff.pax <- diff(pax, differences = 1)
 par(mfrow = c(2, 1))
-plot(pax, type="o", main = "Original Data")
-plot(diff.pax, type="o", main = "Differenced Data") #looks de-trended
+plot(pax, type="o", main = "Original Pax Data")
+plot(diff.pax, type="o", main = "Differenced Pax Data") #looks de-trended
 
 par(mfrow = c(2, 1))
 acf(pax, lag = 80)
@@ -54,9 +60,9 @@ acf2(diff.pax, max.lag = 80)
 diff12.pax <- diff(diff.pax, 12)
 
 par(mfrow = c(3,1))
-plot(pax, type="o", main = "Original Data")
-plot(diff.pax, type="o", main = "Differenced Data")
-plot(diff12.pax, type="o", main = "Differenced (12) Data")
+plot(pax, type="o", main = "Original Pax Data")
+plot(diff.pax, type="o", main = "Differenced Pax Data")
+plot(diff12.pax, type="o", main = "Seasonally Differenced (12) Pax Data")
 
 par(mfrow = c(3, 1))
 acf(pax, lag = 80)
@@ -67,65 +73,145 @@ acf2(pax, max.lag = 80)
 acf2(diff.pax, max.lag = 80)
 acf2(diff12.pax, max.lag = 80)
 
-#fitting a sarima model, sarima(data, p, d, q, P, D, Q, S, details = FALSE)
-(model.1 <- (sarima(pax, 1, 1, 3, 1, 1, 1, 12, detail = FALSE)))
+#fitting a sarima modelbased on acf & pacf plots, sarima(data, p, d, q, P, D, Q, S, details = FALSE)
+(model.1 <- (sarima(pax, 2, 1, 3, 0, 1, 1, 12, detail = FALSE)))
 
-#checking using aic matrix8
+#trying log(pax), fit seems betterand aic is lower
+(model.1a <- (sarima(log(pax), 2, 1, 3, 0, 1, 1, 12, detail = FALSE)))
+
+#checking seasonal and other part fit using aic matrix, row=AR=P, col=MA=Q
+uplim=4
+aicmat.pax <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat.pax[i+1,j+1]=sarima(log(pax),0,1,0,i,1,j,12,details=F,tol=0.001)$AIC
+    print(aicmat.pax)}}
+
+(model.1b <- (sarima(log(pax), 0, 1, 0, 0, 1, 1, 12, detail = FALSE)))
+
+aicmat.pax2 <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat.pax2[i+1,j+1]<-sarima(log(pax), i, 1, j, 0, 1, 1, 12, details=F, tol=0.001)$AIC
+    print(aicmat.pax)}}
+
+#fitting 2nd sarima model, sarima(data, p, d, q, P, D, Q, S, details = FALSE)
+(model.2 <- (sarima(log(pax), 0, 1, 3, 1, 1, 4, 12, detail = FALSE)))
+(model.1a <- (sarima(log(pax), 2, 1, 3, 0, 1, 1, 12, detail = FALSE)))
 
 #forecast
-sarima.for(pax, 120, 1, 1, 3, 1, 1, 1, 12)
-
+sarima.for(log(pax), 120, 2, 1, 3, 0, 1, 1, 12)
 
 #comparing to TAF
-pred <- data.frame(sarima.for(pax, 120, 1, 1, 3, 1, 1, 1, 12)$pred)
-names(pred)[1] <- "pred"
-pred <- data.frame(tapply(pred$pred,cut(pred$pred,12),FUN=sum))
-names(pred)[1] <- "pred"
-pred$year <- c(2016:2027)
+pred <- as.data.frame(as.numeric(exp(sarima.for(log(pax), 120, 1, 1, 3, 1, 1, 1, 12)$pred))) # do i need to exponentiate??
+names(pred)[1] <- "Prediction"
+pred$year <- c(1,1,1,1,1,1,1,1,1,1,1,1,
+                2,2,2,2,2,2,2,2,2,2,2,2,
+                3,3,3,3,3,3,3,3,3,3,3,3,
+                4,4,4,4,4,4,4,4,4,4,4,4,
+                5,5,5,5,5,5,5,5,5,5,5,5,
+                6,6,6,6,6,6,6,6,6,6,6,6,
+                7,7,7,7,7,7,7,7,7,7,7,7,
+                8,8,8,8,8,8,8,8,8,8,8,8,
+                9,9,9,9,9,9,9,9,9,9,9,9,
+                10,10,10,10,10,10,10,10,10,10,10,10)
+pred <- pred %>% select(Prediction, year) %>% group_by(year) %>% summarise(Prediction = sum(Prediction))
+pred[1] <- NULL
+pred$year <- c(2016:2025)
 
 x.taf <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/taf.csv")
-taf <- read.csv(text = x.taf)
+TAF <- read.csv(text = x.taf)
+names(TAF)[2] <- "TAF"
+TAF <- as.data.frame(TAF %>% filter(year <= 2025))
 
-pred <- left_join(pred, taf, by = "year")
-pred <- pred %>% select(year, pred, taf)
+pred <- left_join(pred, TAF, by = "year")
+pred <- pred %>% select(year, Prediction, TAF)
 
-(pred.plot <- ggplot(pred, aes(year)) + 
-  geom_line(aes(y = pred/1000000, colour = "Prediction")) + 
-  geom_line(aes(y = taf/1000000, colour = "TAF")) + coord_fixed(ratio=1))
+pred2 <- melt(pred, id.vars = "year", measure.vars = c("Prediction", "TAF"))
 
-(pred.scatter <- ggplot(pred, aes(x=year, y=pred/1000000)) + geom_point() + geom_smooth(se = FALSE, method = lm)) +coord_fixed(ratio = 1)
-(taf.scatter <- ggplot(pred, aes(x=year, y=taf/1000000)) + geom_point() + geom_smooth(se = FALSE, method = lm))
-
-lm1 <- lm(pred ~ year, data = pred)
-summary(lm1)
-
-lm2 <- lm(taf ~ year, data = pred)
-summary(lm2)
+(pred.plot <- ggplot(pred2, aes(x=year, y=Prediction, color = Value) + 
+  geom_point(size=3, alpha = .8) + geom_smooth(method="lm", se = FALSE) + 
+  labs(x = "\nYear", y="Forecast Enplanements\n", title = "Forecast Comparison") + 
+  theme_hc() + scale_color_tableau() + 
+  theme(plot.title=element_text(size=22)) +
+  theme(axis.text.x=element_text(size=16)) +
+  theme(axis.text.y=element_text(size=16)) +
+  theme(axis.title.y=element_text(size=20, vjust=1.5)) +
+  theme(axis.title.x=element_text(size=18, vjust=-.5)) + 
+  theme(text=element_text(family="Georgia")) + 
+  scale_y_continuous(labels=comma) + 
+  theme(legend.position = "right") + theme(legend.title = element_blank())))
 
 #regression with ARIMA Errors ----
 
-phl$year2 <- phl$year
-phl$year2 <- as.character(phl$year2)
-phl$year2 <- as.numeric(phl$year2)
+#scatterplot to check for trend, slight negative trend present
+(scatter.plot <- ggplot(phl, aes(x=date, y=log(pax))) + 
+   geom_point() + geom_smooth())
 
-lm <- lm(pax ~ time(month) + emp + earnings, data = phl) #should I use date? or year? or month? need to format as time(year) or ts(month)?
+#scatterplot matrix
+pairs(phl[, 3:6])
+
+#regression model: t = β0 + β1t + β2xt+ β2xt + ϵt 
+t <- seq(2007, 2015.583, by=1/12)
+t2 <- t*t
+phl$month2 <- month(phl$date)
+
+lm <- lm(log(pax) ~ t + t2 + factor(month2) + log(emp) + earnings/1000, data=subset(phl, date <= "2015-07-01")) #should I use date? or year? or month? need to format as time(year) or ts(month)?
 summary(lm)
 plot(lm)
 
-resids <- ts(lm$residuals, frequency=12)
+#saving residuals, plotting, differencing and plotting acf/pacf
+resids <- (lm$residuals)
 plot(resids, type="o")
+acf2(resids)
 
 diff.resids <- diff(resids)
-plot(diff.resids, type="o")
+plot(lm$residuals, type="l")
+acf2(diff.resids)
 
 diff12.resids <- diff(diff.resids, 12)
 plot(diff12.resids, type="o")
+acf2(diff12.resids, max.lag = 85)
 
-acf2(resids, max.lag = 100)
-acf2(diff.resids, max.lag=100)
-acf2(diff12.resids, max.lag = 90)
+#initial residual model
+(sarima.resids <- sarima(resids, 1, 1, 3, 0, 1, 1, 12, details = FALSE))
 
-(sarima.resids <- sarima(resids, 1, 1, 3, 1, 1, 1, 12, details = FALSE))
+#checking number of seasonal terms
+uplim=4
+aicmat.resids <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat.resids[i+1,j+1]<-sarima(resids, 0, 1, 0, i, 1, j, 12, details=F, tol=0.001)$AIC
+    print(aicmat.resids)}}
 
-lm.coeff <- data.frame(coefficients(lm))
-sarima.coeff <- data.frame(c(0.6295, -1.3205, 0.5266, -0.1664, 0.2012, -0.9990))
+which.min(aicmat.resids) #suggests AR(1), MA(4)
+
+#checking number of other terms
+uplim=4
+aicmat.resids2 <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat.resids2[i+1,j+1]<-sarima(resids, i, 1, j, 1, 1, 4, 12, details=F, tol=0.001)$AIC
+    print(aicmat.resids2)}}
+
+which.min(aicmat.resids2)
+
+#fitting 2nd sariam model, think 1st one is better
+(sarima.resids2 <- sarima(resids, 4, 1, 2, 1, 1, 4, 12, details = FALSE))
+
+
+
+beta <- lm$coefficients
+xmat <- matrix(double(103*16), 103, 16)
+W
+xmat[1,4]=1
+xmat[2,5]=1
+xmat[3,6]=1
+xmat[4,7]=1
+xmat[5,8]=1
+xmat[6,9]=1
+xmat[7,10]=1
+xmat[8,11]=1
+xmat[9,12]=1
+xmat[10,13]=1
+xmat[11,14]=1
