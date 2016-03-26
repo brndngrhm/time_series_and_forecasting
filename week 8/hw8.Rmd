@@ -6,12 +6,14 @@ output: word_document
 ---
 1)
 
-Using the classical decomposition technique from class, I fit an ARMA(3,2) model to the residuals of my regression. This gives me 
+Using the classical decomposition technique from class, I fit an ARMA(3,2) model to the residuals of my regression. This gives me the following forecast plots
 
 
 Using an ARMA(3,2) model with seasonal differencing results in the following forecast for the next year
 
 ```{r, echo = FALSE}
+library(astsa)
+
 pred2=sarima.for(log(unemp), 12, 3, 1, 2, 0, 1, 0, 12)
 ```
 
@@ -26,7 +28,7 @@ load("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/da
 
 ```
 
-a) Changing n from 100 to 128 reduces the frequencies in x1, x2 and x3 from 0.06, 0.10, 0.40 to 0.046875, 0.078125 and 0.3125, respectively. The increase in n doesn't affect how the plots of x1, x2, and x3 look, but it does change the plot of their sum.
+a) Changing n from 100 to 128 changes the fundamental frequencies of x1, x2 and x3 from 0.06, 0.10, 0.40 to 0.046875, 0.078125 and 0.3125, respectively. The increase in n doesn't affect how the plots of x1, x2, and x3 look, but it does change the plot of their sum since the fundamental
 
 ```{r, echo=FALSE}
 
@@ -40,8 +42,7 @@ par(mfrow=c(2,2))
 plot.ts(x1, ylim=c(-10,10), main=expression(omega==6/100~~~A^2==13))
 plot.ts(x2, ylim=c(-10,10), main=expression(omega==10/100~~~A^2==41))
 plot.ts(x3, ylim=c(-10,10), main=expression(omega==40/100~~~A^2==85))
-plot.ts(x.1, ylim=c(-20,20), main="Original Sum")
-
+plot.ts(x.1, ylim=c(-20,20), main="Original Sum", type="l")
 
 #new
 n <- 128
@@ -82,8 +83,10 @@ c) The addition of the white noise terms...The addition of the white noise term 
 
 #part c
 #old
+x1 = 2*cos(2*pi*1:100*6/100) + 3*sin(2*pi*1:100*6/100)
+x2 = 4*cos(2*pi*1:100*10/100) + 5*sin(2*pi*1:100*10/100)
+x3 = 6*cos(2*pi*1:100*40/100) + 7*sin(2*pi*1:100*40/100)
 x.1 = x1 + x2 + x3
-plot.ts(x.1, ylim=c(-20,20), main="Original Sum")
 
 #new
 x1 = 2*cos(2*pi*1:100*6/100) + 3*sin(2*pi*1:100*6/100)
@@ -96,7 +99,7 @@ plot.ts(x.1, ylim=c(-20,20), main="Original Sum")
 plot.ts(x.3, ylim=c(-20,20), main="Sum with White Noise Term")
 
 x.4 <- x.1 + rnorm(n = 100, mean = 0, sd = 5)
-P = Mod(2*fft(x.3)/n)^2
+P = Mod(2*fft(x.3)/100)^2
 Fr = 0:99/100
 plot(Fr, P, type="o", xlab="frequency", ylab="periodogram", main = "Periodogram with White Noise Term")
 ```
