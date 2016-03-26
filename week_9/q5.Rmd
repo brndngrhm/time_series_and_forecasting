@@ -1,0 +1,27 @@
+---
+title:
+author: "Brendan Graham"
+date: "March 26, 2016"
+output: html_document
+---
+
+5. a) The spectral density plot below shows spikes around 0 and about 0.33, which suggests the the process will show oscillatory behavior with a peiod of about 3.
+
+```{r, echo = FALSE, fig.align='center'}
+
+library(astsa)
+
+arma.spec(ar = c(0, 0, .99), log="no", main = "Spectral Density Plot")
+
+
+```
+
+
+b) The time series plot below indicate that after about every 3 points the series repeats after 3 points
+```{r, echo = FALSE, fig.align='center'}
+
+ts_AR <- arima.sim(n=100, list(ar=c(0, 0, .99)))
+
+plot(ts_AR, type = "o", ylab = "simulated process", main = "Time Series Plot")
+```
+
