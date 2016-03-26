@@ -104,6 +104,7 @@ lines(xmat[,2],pred,lty=2) #Without is the dashed curve
 #Plotting just the ARMA predictions.
 plot(pred2$pred)
 
+plot(decompose(log(unemp)))
 
 
 pred2=sarima.for(log(unemp), 12, 3, 1, 2, 0, 1, 0, 12)
