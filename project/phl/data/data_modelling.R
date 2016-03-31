@@ -145,10 +145,17 @@ pred2 <- melt(pred, id.vars = "year", measure.vars = c("Prediction", "TAF"))
 #regression with ARIMA Errors ----
 
 #regression model: t = β0 + β1t + β2xt+ β2xt + ϵt 
-phl$t <- seq(1, 104, by=1)
-phl$t2 <- (phl$t)^2
+pax <- ts(phl$pax, frequency=12)
+trend <- time(phl$pax)
+trend <- ts(trend, frequency = 12)
+emp <- phl$emp - mean(phl$emp)
+emp <- ts(emp, frequency = 12)
+emp2 <- emp^2
+earnings <- phl$earnings - mean(phl$earnings)
+earnings <- ts(earnings, frequency = 12)
+earnings2 <- earnings^2
 
-lm <- lm(log(pax) ~ t + t2 + emp + earnings, data=phl)
+lm <- lm(log(pax) ~ trend + emp + earnings + earnings2)
 summary(lm)
 plot(lm)
 
@@ -166,6 +173,8 @@ plot(diff12.resids, type="o")
 acf2(diff12.resids, max.lag = 85)
 
 #initial residual model
+
+#aic matrix for seasonal part
 uplim <- 4
 aicmat2 <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
 for (i in 0:uplim){
@@ -173,22 +182,20 @@ for (i in 0:uplim){
     aicmat2[i+1,j+1]=sarima(resids,0,1,0,i,1,j,12,details=F,tol=0.001)$AIC
     print(aicmat2)}}
 
-#Trying to fit the other part.
-
+#Trying to fit the other part. !!stops working halfway throuh for some reason??
 uplim <- 4
 aicmat <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
 for (i in 0:uplim){
   for (j in 0:uplim){
-    aicmat[i+1,j+1]<-sarima(resids,i,1,j,2,1,2,12,details=F,tol=0.00001)$AIC
+    aicmat[i+1,j+1]<-sarima(resids,i,1,j,2,1,2,12,details=F,tol=0.001)$AIC
     print(aicmat)}}
 
 sarima(resids,0,1,1,2,1,2,12,details = FALSE)
 
 #fitting model with arima errors
-pax <- ts(phl$pax, frequency=12)
-t <- phl$t
-t2 <- phl$t2
-earnings <- phl$earnings
-emp <- phl$emp
 
-sarima(pax, 0,1,1,2,1,2,12, details = FALSE, xreg = cbind(t, t2, earnings, emp))
+#Model gives an error when t and t2 are included but is ok without them
+#model also gives error with log(pax), not sure of the reason for either of these errors
+#log(pax) works with 1 xreg variable at a time, but when when use cbind()
+
+sarima(log(pax), 0,1,1,2,1,2,12, details = FALSE, xreg = cbind(trend, emp, earnings, earnings2))
