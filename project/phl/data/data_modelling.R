@@ -144,25 +144,38 @@ pred2 <- melt(pred, id.vars = "year", measure.vars = c("Prediction", "TAF"))
 
 #regression with ARIMA Errors ----
 
-#regression model: t = β0 + β1t + β2xt+ β2xt + ϵt 
-pax <- ts(phl$pax, frequency=12)
-trend <- time(phl$pax)
-trend <- ts(trend, frequency = 12)
+#format data
+pax <- phl$pax
+time <- 1:104
+time2 <- time^2
 emp <- phl$emp - mean(phl$emp)
-emp <- ts(emp, frequency = 12)
 emp2 <- emp^2
 earnings <- phl$earnings - mean(phl$earnings)
-earnings <- ts(earnings, frequency = 12)
 earnings2 <- earnings^2
+pax2 <- data.frame(cbind(pax, time, time2, emp, emp2, earnings, earnings2))
 
-lm <- lm(log(pax) ~ trend + emp + earnings + earnings2)
+#plot of pax vs earnings, suggests earnings^2 would be good to use as well
+ggplot(pax2,aes(x=earnings,y=pax)) + geom_point() + geom_smooth()
+
+#plot of pax vs earnings, 
+ggplot(pax2,aes(x=emp,y=pax)) + geom_point() + geom_smooth()
+
+lm <- lm(log(pax) ~ ., data = pax2)
 summary(lm)
 plot(lm)
 
+step(lm, direction = "forward")
+step(lm, direction = "backward")
+step(lm, direction = "both")
+
+lm2 <-  lm(log(pax) ~ earnings + earnings2, data = pax2)
+summary(lm2)
+plot(lm2)
+
 #saving residuals, plotting, differencing and plotting acf/pacf
-resids <- (lm$residuals)
+resids <- (lm2$residuals)
 plot(resids, type="o")
-acf2(resids)
+acf2(resids,  max.lag = 85)
 
 diff.resids <- diff(resids)
 plot(lm$residuals, type="l")
@@ -187,10 +200,10 @@ uplim <- 4
 aicmat <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
 for (i in 0:uplim){
   for (j in 0:uplim){
-    aicmat[i+1,j+1]<-sarima(resids,i,1,j,2,1,2,12,details=F,tol=0.001)$AIC
+    aicmat[i+1,j+1]<-sarima(resids,i,1,j,1,1,1,12,details=F,tol=0.001)$AIC
     print(aicmat)}}
 
-sarima(resids,0,1,1,2,1,2,12,details = FALSE)
+sarima(resids,0,1,1,1,1,1,12,details = FALSE)
 
 #fitting model with arima errors
 
@@ -198,4 +211,4 @@ sarima(resids,0,1,1,2,1,2,12,details = FALSE)
 #model also gives error with log(pax), not sure of the reason for either of these errors
 #log(pax) works with 1 xreg variable at a time, but when when use cbind()
 
-sarima(log(pax), 0,1,1,2,1,2,12, details = FALSE, xreg = cbind(trend, emp, earnings, earnings2))
+sarima(log(pax), 0,1,1,1,1,1,12, details = FALSE, xreg = cbind(earnings, earnings2))
