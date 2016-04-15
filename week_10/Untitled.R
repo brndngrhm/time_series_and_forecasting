@@ -5,11 +5,28 @@ library(fGarch)
 
 #5.6
 gnpgr <- diff(log(gnp)) #converts to growth rate
-plot(gnpgr, type='l') #seems like white noise process
-acf2(gnpgr) #AR 1 seems like a good fit
-model <- sarima(gnpgr, 1,0,0)
+plot(log(gnp), type='l') #seems like white noise process
+acf2(gnpgr)
+
+uplim<-4
+aicmat2<-matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat2[i+1,j+1]<-arima(gnpgr,order=c(i,0,j))$aic}}
+print(aicmat2)
+
+model <- sarima(gnpgr, 2,0,3)
 acf2(resid(model$fit)^2) #pulling out and plotting squared residuals
-fit1 <- garchFit(~arma(1,0) + garch(1,0), gnpgr, trace = F) #fitting a GARCH model
+
+fit1 <- garchFit(~arma(3,2) + garch(2,1), gnpgr, trace = F) #fitting a GARCH model
+
+#checking GARCH fit
+summary(fit1)
+sr <- fit1@residuals/fit1@sigma.t
+plot(sr,type='l') #seem like white noise
+acf2(sr) # a few significant lags
+acf2(sr^2) #doesn't seem to show signs of ARCH
+
 
 #5.7
 diff.log.oil <- diff(log.oil) #this is the growth rate
@@ -25,7 +42,7 @@ for (i in 0:uplim){
 print(aicmat2)
 
 #fitting model
-model2 <- sarima(diff.log.oil,4,0,4,0,0,0,details = FALSE) #looks ok
+model2 <- sarima(diff.log.oil,1,0,4,0,0,0,details = FALSE) #looks ok
 resids <- resid(model2$fit)
 acf2(resids^2) #evidence of GARCH behavior
 
