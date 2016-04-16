@@ -13,6 +13,8 @@ library(astsa)
 library(ggthemes)
 library(extrafont)
 library(reshape)
+library(car)
+library(forecast)
 
 #part I: data prep ----
   
@@ -163,7 +165,7 @@ pax <- ts(phl$pax, frequency = 12)
 emp <- ts(phl$emp, frequency = 12)
 earnings <- ts(phl$earnings, frequency = 12)
 
-#time series plots of each variable, all show evidence of non stationarity
+#time series plots of each variable, all show evidence of non stationarity (trend, heterskedasticity, seasonality)
 (pax.plot <- ggplot(phl, aes(x=date, y=pax)) + 
   geom_point() + geom_line() + geom_smooth(se = F) + 
   labs(title = "Passengers\n"))
@@ -176,8 +178,143 @@ earnings <- ts(phl$earnings, frequency = 12)
   geom_point() + geom_line() + geom_smooth(se = F) + 
   labs(title = "Earnings\n"))
 
-
 #ACF plots of each variable
 acf2(pax, max.lag = 80)
 acf2(earnings, max.lag = 80)
 acf2(emp, max.lag = 80)
+
+#Since  there is both trend and seasonality apparent in each series, need to difference twice for Trend and Seasonality
+dl.pax <- diff(log(pax), 1)
+dl.emp <- diff(log(emp), 1)
+dl.earnings <- diff(log(earnings), 1)
+
+dl12.pax <- diff(dl.pax, 12)
+dl12.emp <- diff(dl.emp, 12)
+dl12.earnings <- diff(dl.earnings, 12)
+
+#ts plots and ACF plots of new variables
+plot(dl12.pax, type = "o")
+plot(dl12.emp, type = "o")
+plot(dl12.earnings, type = "o")
+
+acf2(dl12.pax, max.lag = 80)
+acf2(dl12.earnings, max.lag = 80)
+acf2(dl12.emp, max.lag = 80)
+
+#fitting a SARIMA model for PAX alone, forecasting 2 months and comparing to actual pax at PHl----
+
+#checking seasonal and other part fit using aic matrix, row=AR=P, col=MA=Q, and fitting a SARIMA model
+uplim=4
+aicmat.pax <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat.pax[i+1,j+1]=sarima(log(pax),0,1,0,i,1,j,12,details=F,tol=0.001)$AIC
+    print(aicmat.pax)}}
+
+aicmat.pax2 <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat.pax2[i+1,j+1]<-sarima(log(pax), i, 1, j, 0, 1, 2, 12, details=F, tol=0.001)$AIC
+    print(aicmat.pax2)}}
+
+(model <- sarima(log(pax), 2, 1, 3, 0, 1, 1, 12, detail = FALSE))
+
+#SARIMA forecast
+sarima.for(log(pax), 2, 2, 1, 3, 0, 1, 1, 12)
+
+pred <- as.data.frame(as.numeric(exp(sarima.for(log(pax),2,1,1,3,1,1,1,12)$pred))) # do i need to exponentiate??
+names(pred)[1] <- "Prediction"
+pred$month <- c(9,10)
+
+new.phl <- read.csv("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl_new.csv")
+names(new.phl) <- tolower(names(new.phl))
+new.phl <- new.phl %>% filter(origin == "PHL" & month > 8) %>% group_by(month) %>% summarise(pax = sum(passengers))
+
+pred <- left_join(pred, new.phl, by = "month")
+pred <- pred %>% select(month, Prediction, pax)
+pred$diff <- pred$Prediction - pred$pax
+
+pred2 <- melt(data.frame(pred), id = "month", measure.vars = c("Prediction", "pax", "exp.pred"))
+
+(pred.plot <- ggplot(pred2, aes(x=month, y=value, color = variable)) + 
+                       geom_point() + geom_smooth(method="lm", se = FALSE))
+
+#regression with arma errors ----
+
+#scatterplot matrix
+scatterplotMatrix(~ pax + earnings + emp, data = phl, smoother = FALSE)
+
+#looking at scatterplots of variables vs each other
+(pax <- ggplot(phl, aes(x=date, y=pax)) + geom_point() + geom_line() +  geom_smooth(se = F))
+(pax.emp <- ggplot(phl, aes(x=emp, y=pax)) + geom_point() + geom_smooth(se = F))
+(pax.earnings <- ggplot(phl, aes(x=earnings, y=pax)) + geom_point() + geom_smooth(se = F))
+
+#creating data frame to use for regression w/ arma errors
+pax <- phl$pax
+time <- 1:104
+time2 <- time^2
+emp <- phl$emp - mean(phl$emp)
+emp2 <- emp^2
+earnings <- phl$earnings - mean(phl$earnings)
+earnings2 <- earnings^2
+pax2 <- data.frame(cbind(pax, time, time2, emp, emp2, earnings, earnings2))
+
+#1st regression model using all variables, not a lot of significant variables
+lm <- lm(log(pax) ~ ., data = pax2)
+summary(lm)
+plot(lm)
+
+#trying variable selection techniques
+step(lm, direction = "forward")
+step(lm, direction = "backward")
+step(lm, direction = "both")
+
+#second regression model based on variable selection techniques
+lm2 <-  lm(log(pax) ~ earnings + earnings2, data = pax2)
+summary(lm2)
+plot(lm2)
+
+#saving residuals, plotting, shows evidnce of seasonality
+resids <- (lm2$residuals)
+plot(resids, type="o")
+acf2(resids,  max.lag = 85)
+
+#aic matrix for seasonal part
+uplim <- 4
+aicmat.resids <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat.resids[i+1,j+1]=sarima(resids,0,1,0,i,1,j,12,details=F,tol=0.001)$AIC
+    print(aicmat.resids)}}
+
+#Trying to fit the other part. !!stops working halfway throuh for some reason??
+uplim <- 4
+aicmat.resids2 <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat.resids2[i+1,j+1]<-sarima(resids,i,1,j,0,1,1,12,details=F,tol=0.001)$AIC
+    print(aicmat.resids2)}}
+
+#SARIMA residual model
+sarima(resids,2,1,1,0,1,1,12,details = FALSE)
+
+pax <- ts(pax, frequency = 12)
+earnings <- ts(earnings, frequency = 12)
+earnings2 <- earnings^2
+x <- cbind(earnings, earnings^2)
+
+#Regression w arma erorrs (https://www.otexts.org/fpp/9/1)
+fit <- Arima(x=log(pax), xreg = x, order = c(2,1,1), seasonal = c(0,1,1))
+forecast <- forecast(fit, xreg = )
+
+#lagged variable regression ----
+
+pax <- ts(phl$pax, frequency = 12)
+emp <- ts(phl$emp, frequency = 12)
+earnings <- ts(phl$earnings, frequency = 12)
+
+#cross correllation plots
+earnings.ccf <- ccf(pax, diff(earnings)) #1 month, 6 months
+emp.ccf <- ccf(pax[1:103], diff(emp)) #6 months
+
+lm2 <- lm(log(pax) ~ )
