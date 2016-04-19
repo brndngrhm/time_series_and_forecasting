@@ -18,7 +18,7 @@ library(reshape)
 
 ----------------------------
 ----------------------------
-#PART I: DATA PREP
+#PART I: DATA PREP ----
 ----------------------------
 ----------------------------
 
@@ -161,17 +161,20 @@ socio <- left_join(emp, earnings, by = c("year", "month"))
 phl <- left_join(phl, socio, by = c("year", "month"))
 phl$year <- as.factor(phl$year)
 phl <- phl %>% select(date, year, month, pax, emp, earnings)
-save(phl, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/phl.rda") 
+#save(phl, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/phl.rda") 
 
 
 
+---------------------------- 
 ----------------------------
-----------------------------
-#PART II: DATA EXPLORATION
+
+
+
+#PART II: DATA EXPLORATION ----
 ----------------------------
 ----------------------------
   
-#some plots ----
+#some TS plots ----
 (pax.plot <- ggplot(phl, aes(x=date, y=pax)) + 
    geom_point() + geom_line() + 
    labs(x= "", y= "Enplanements\n", title = "PHL Monthly Enplanements: 2007-2015\n") + 
@@ -281,7 +284,12 @@ acf2(diff12.earnings2, max.lag = 90)
 
 ----------------------------
 ----------------------------
-#PART III: DATA MODELlING
+
+#cross correllation plots
+ccf(pax, emp)
+ccf(pax, earnings)
+
+#PART III: DATA MODELlING ----
 ----------------------------
 ----------------------------
 
@@ -349,16 +357,14 @@ for (i in 0:uplim){
     aicmat.pax[i+1,j+1]=sarima(log(pax),0,1,0,i,1,j,12,details=F,tol=0.001)$AIC
     print(aicmat.pax)}}
 
-(model.1b <- (sarima(log(pax), 0, 1, 0, 0, 1, 1, 12, detail = FALSE)))
-
 aicmat.pax2 <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
 for (i in 0:uplim){
   for (j in 0:uplim){
-    aicmat.pax2[i+1,j+1]<-sarima(log(pax), i, 1, j, 0, 1, 1, 12, details=F, tol=0.001)$AIC
-    print(aicmat.pax)}}
+    aicmat.pax2[i+1,j+1]<-sarima(log(pax), i, 1, j, 1, 1, 1, 12, details=F, tol=0.001)$AIC
+    print(aicmat.pax2)}}
 
 #fitting 2nd sarima model, sarima(data, p, d, q, P, D, Q, S, details = FALSE)
-(model.2 <- (sarima(log(pax), 0, 1, 3, 1, 1, 4, 12, detail = FALSE)))
+(model.2 <- (sarima(log(pax), 0, 1, 1, 1, 1, 1, 12, detail = FALSE)))
 (model.1a <- (sarima(log(pax), 2, 1, 3, 0, 1, 1, 12, detail = FALSE)))
 
 #forecast
