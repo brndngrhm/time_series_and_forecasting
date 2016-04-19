@@ -15,8 +15,9 @@ library(extrafont)
 library(reshape)
 library(car)
 library(forecast)
+library(fGarch)
 
-#part I: data prep ----
+#data prep ----
   
 #read enplanement data, format and combine
 
@@ -158,7 +159,7 @@ phl$year <- as.factor(phl$year)
 phl <- phl %>% select(date, year, month, pax, emp, earnings)
 #save(phl, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/phl.rda") 
 
-#part II: exploring ----
+#exploring ----
 
 #format pax, emp and earnings as monthly time series w/frequency 12
 pax <- ts(phl$pax, frequency = 12)
@@ -201,7 +202,7 @@ acf2(dl12.pax, max.lag = 80)
 acf2(dl12.earnings, max.lag = 80)
 acf2(dl12.emp, max.lag = 80)
 
-#fitting a SARIMA model for PAX alone, forecasting 2 months and comparing to actual pax at PHl----
+#fitting a SARIMA model for PAX alone, forecasting 2 months and comparing to actual pax at PHl ----
 
 #checking seasonal and other part fit using aic matrix, row=AR=P, col=MA=Q, and fitting a SARIMA model
 uplim=4
@@ -222,27 +223,10 @@ for (i in 0:uplim){
 #SARIMA forecast
 sarima.for(log(pax), 2, 2, 1, 3, 0, 1, 1, 12)
 
-pred <- as.data.frame(as.numeric(exp(sarima.for(log(pax),2,1,1,3,1,1,1,12)$pred))) # do i need to exponentiate??
-names(pred)[1] <- "Prediction"
-pred$month <- c(9,10)
-
-new.phl <- read.csv("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl_new.csv")
-names(new.phl) <- tolower(names(new.phl))
-new.phl <- new.phl %>% filter(origin == "PHL" & month > 8) %>% group_by(month) %>% summarise(pax = sum(passengers))
-
-pred <- left_join(pred, new.phl, by = "month")
-pred <- pred %>% select(month, Prediction, pax)
-pred$diff <- pred$Prediction - pred$pax
-
-pred2 <- melt(data.frame(pred), id = "month", measure.vars = c("Prediction", "pax", "exp.pred"))
-
-(pred.plot <- ggplot(pred2, aes(x=month, y=value, color = variable)) + 
-                       geom_point() + geom_smooth(method="lm", se = FALSE))
-
 #regression with arma errors ----
 
 #scatterplot matrix
-scatterplotMatrix(~ pax + earnings + emp, data = phl, smoother = FALSE)
+scatterplotMatrix(~ pax + earnings + emp, data = phl)
 
 #looking at scatterplots of variables vs each other
 (pax <- ggplot(phl, aes(x=date, y=pax)) + geom_point() + geom_line() +  geom_smooth(se = F))
@@ -270,7 +254,7 @@ step(lm, direction = "backward")
 step(lm, direction = "both")
 
 #second regression model based on variable selection techniques
-lm2 <-  lm(log(pax) ~ earnings + earnings2, data = pax2)
+lm2 <-  lm(log(pax) ~ earnings, data = pax2)
 summary(lm2)
 plot(lm2)
 
@@ -296,16 +280,135 @@ for (i in 0:uplim){
     print(aicmat.resids2)}}
 
 #SARIMA residual model
-sarima(resids,2,1,1,0,1,1,12,details = FALSE)
+sarima(resids,1,1,0,0,1,1,12,details = FALSE)
 
 pax <- ts(pax, frequency = 12)
 earnings <- ts(earnings, frequency = 12)
 earnings2 <- earnings^2
 x <- cbind(earnings, earnings^2)
+x <- cbind(emp, earnings)
 
 #Regression w arma erorrs (https://www.otexts.org/fpp/9/1)
-fit <- Arima(x=log(pax), xreg = x, order = c(2,1,1), seasonal = c(0,1,1))
-forecast <- forecast(fit, xreg = )
+#september monthly earnings = 958.42*4
+#october monthly earnings = 9s58.04*4
+
+fit <- Arima(x=log(pax), xreg = earnings, order = c(1,1,0), seasonal = c(0,1,1))
+
+forecast <- forecast(fit, h=2, xreg = c(3833.68, 3832.16))
+
+reg.arma.pred <-as.data.frame(c(1062803, 1157508))
+names(reg.arma.pred)[1] <- "Reg w/ ARMA Pred"
+reg.arma.pred$month <- c(9,10)
+
+#classical decompisition ----
+pax2 <- log(pax[1:96])
+t=seq(2007,2014.917,by=1/12)
+t2 <- t^2
+plot(t,pax2,type='l') #Seems to be nearly linear with period-12 seasonal component.
+season=rep(1:12,8)
+out=lm(pax2~t+t2+factor(season))
+plot(out$residuals,type='l')
+acf2(out$residuals)
+
+dat=out$residuals
+uplim=4
+aicmat=matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat[i+1,j+1]=arima(dat,order=c(i,0,j))$aic}}
+aicmat #First version
+
+dat=out$residuals
+uplim=4
+aicmat2=matrix(double((uplim+1)^2),uplim+1,uplim+1)
+for (i in 0:uplim){
+  for (j in 0:uplim){
+    aicmat2[i+1,j+1]=sarima(dat,i,0,j,details=F)$AIC}}
+aicmat2 #Second version
+
+
+#Fitting ARMA(4,4).
+sarima(dat,4,0,4,details=F)
+
+#Doing the forecasting (for 2 months ahead)
+beta=out$coeff
+xmat=matrix(double(12*14),12,14)
+xmat[,1]=1
+xmat[,2]=seq(2007,2014.917,length=12)
+xmat[,3]=seq(2007,2014.917,length=12)^2
+xmat[1,4]=1
+xmat[2,5]=1
+xmat[3,6]=1
+xmat[4,7]=1
+xmat[5,8]=1
+xmat[6,9]=1
+xmat[7,10]=1
+xmat[8,11]=1
+xmat[9,12]=1
+xmat[10,13]=1
+xmat[11,14]=1
+pred=xmat %*% beta
+pred2=sarima.for(dat,12,4,0,4)
+tot=pred+pred2$pred
+
+#Plotting actual and fitted values.
+plot(t,pax2)
+lines(t,out$fitted.values)
+
+#Adding things together to make the forecasts.
+plot(t,pax2,xlim=c(2007,2016),type='l')
+lines(xmat[,2],tot,lty=2)
+
+#Forecasts with and without the ARMA part.
+plot(xmat[,2],tot,lty=1,type='l') #With is the solid curve
+lines(xmat[,2],pred,lty=2) #Without is the dashed curve
+
+#Plotting just the ARMA predictions.
+plot(pred2$pred)
+
+#comparing predicted to actual ----
+sarima.pred <- as.data.frame(as.numeric(exp(sarima.for(log(pax),2,1,1,3,1,1,1,12)$pred))) # do i need to exponentiate??
+names(sarima.pred)[1] <- "SARIMA Prediction"
+sarima.pred$month <- c(9,10)
+
+reg.arma.pred <-as.data.frame(c(1062803, 1157508))
+names(reg.arma.pred)[1] <- "Reg w/ ARMA Pred"
+reg.arma.pred$month <- c(9,10)
+
+decomp.pred <- as.data.frame(c(965740.1, 1169363))
+names(decomp.pred)[1] <- "Classical Decomposition Prediction"
+decomp.pred$month <- c(9,10)
+
+phl.new <- read.csv("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl_new.csv")
+names(phl.new) <- tolower(names(phl.new))
+phl.new$month <- as.numeric(phl.new$month)
+phl.new$origin <- as.character(phl.new$origin)
+phl.new <- phl.new %>% dplyr::filter(origin == "PHL" & month > 8) %>% group_by(month) %>% summarise(pax = sum(passengers)) %>% ungroup()
+names(phl.new)[2] <- "Actual Passengers"
+names(phl.new)[1] <- "month"
+
+pred.table <- left_join(sarima.pred, reg.arma.pred, by = "month")
+pred.table <- left_join(pred.table, decomp.pred, by = "month")
+pred.table <- left_join(pred.table, phl.new, by = "month")
+
+pred.table.melt<- melt(data.frame(pred.table), id = "month", measure.vars = )
+
+(pred.plot <- ggplot(pred.table.melt, aes(x=month, y=value, color = variable)) + 
+  geom_point() + geom_smooth(method="lm", se = FALSE) + theme_fivethirtyeight() + 
+  labs(x="\nMonth", y="Passngers\n", title = "Actual and Predicted Passengers\n"))
+
+#ARCH/GARCH ----
+acf2(dl12.pax)
+model <- sarima(dl12.pax, 1,0,0)
+acf2(resid(model$fit)^2) #pulling out and plotting squared residuals
+fit1 <- garchFit(~arma(1,1) + garch(1,0), dl12.pax, trace = F) #fitting a GARCH model
+
+#checking GARCH fit
+summary(fit1)
+sr <- fit1@residuals/fit1@sigma.t
+plot(sr,type='l') #seem like white noise
+acf2(sr) # a few significant lags
+acf2(sr^2) #doesn't seem to show signs of ARCH
 
 #lagged variable regression ----
 
@@ -314,7 +417,5 @@ emp <- ts(phl$emp, frequency = 12)
 earnings <- ts(phl$earnings, frequency = 12)
 
 #cross correllation plots
-earnings.ccf <- ccf(pax, diff(earnings)) #1 month, 6 months
-emp.ccf <- ccf(pax[1:103], diff(emp)) #6 months
-
-lm2 <- lm(log(pax) ~ )
+earnings.ccf <- ccf(dl12.pax, dl12.earnings) #6 month, 10 months
+emp.ccf <- ccf(dl12.pax, dl12.emp) #14 months
