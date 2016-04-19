@@ -202,7 +202,7 @@ acf2(dl12.pax, max.lag = 80)
 acf2(dl12.earnings, max.lag = 80)
 acf2(dl12.emp, max.lag = 80)
 
-#fitting a SARIMA model for PAX alone, forecasting 2 months and comparing to actual pax at PHl ----
+#fitting a SARIMA model for PAX alone ----
 
 #checking seasonal and other part fit using aic matrix, row=AR=P, col=MA=Q, and fitting a SARIMA model
 uplim=4
@@ -234,11 +234,13 @@ scatterplotMatrix(~ pax + earnings + emp, data = phl)
 (pax.earnings <- ggplot(phl, aes(x=earnings, y=pax)) + geom_point() + geom_smooth(se = F))
 
 #creating data frame to use for regression w/ arma errors
-pax <- phl$pax
+pax <- ts(phl$pax, frequency = 12)
 time <- 1:104
 time2 <- time^2
+emp <- ts(phl$emp, frequency = 12)
 emp <- phl$emp - mean(phl$emp)
 emp2 <- emp^2
+earnings <- ts(phl$earnings, frequency = 12)
 earnings <- phl$earnings - mean(phl$earnings)
 earnings2 <- earnings^2
 pax2 <- data.frame(cbind(pax, time, time2, emp, emp2, earnings, earnings2))
@@ -246,7 +248,6 @@ pax2 <- data.frame(cbind(pax, time, time2, emp, emp2, earnings, earnings2))
 #1st regression model using all variables, not a lot of significant variables
 lm <- lm(log(pax) ~ ., data = pax2)
 summary(lm)
-plot(lm)
 
 #trying variable selection techniques
 step(lm, direction = "forward")
@@ -254,9 +255,8 @@ step(lm, direction = "backward")
 step(lm, direction = "both")
 
 #second regression model based on variable selection techniques
-lm2 <-  lm(log(pax) ~ earnings, data = pax2)
+lm2 <-  lm(log(pax) ~ earnings + earnings2, data = pax2)
 summary(lm2)
-plot(lm2)
 
 #saving residuals, plotting, shows evidnce of seasonality
 resids <- (lm2$residuals)
@@ -282,19 +282,19 @@ for (i in 0:uplim){
 #SARIMA residual model
 sarima(resids,1,1,0,0,1,1,12,details = FALSE)
 
-pax <- ts(pax, frequency = 12)
-earnings <- ts(earnings, frequency = 12)
-earnings2 <- earnings^2
-x <- cbind(earnings, earnings^2)
-x <- cbind(emp, earnings)
-
 #Regression w arma erorrs (https://www.otexts.org/fpp/9/1)
-#september monthly earnings = 958.42*4
-#october monthly earnings = 9s58.04*4
+#september monthly earnings = 958.42*4=3833.68
+#october monthly earnings = 958.04*4=3832.16
+regressors <- cbind(earnings, earnings2)
 
-fit <- Arima(x=log(pax), xreg = earnings, order = c(1,1,0), seasonal = c(0,1,1))
+fit <- Arima(log(pax), order=c(1,1,0), seasonal = c(0,1,1), xreg=regressors)
 
-forecast <- forecast(fit, h=2, xreg = c(3833.68, 3832.16))
+(forecast <- forecast.Arima(fit, xreg = c(3833.68, 3832.16)))
+
+#http://stats.stackexchange.com/questions/34493/time-series-modeling-with-dynamic-regressors-in-sas-vs-in-r
+fity <- auto.arima(log(pax), max.p=4, max.q=4, max.P=4, max.Q=4, stationary = TRUE, stepwise = TRUE, xreg=x, approximation = TRUE)
+fitx <- auto.arima(x, max.p=4, max.q=4, max.P=4, max.Q=4, stationary = TRUE, stepwise = TRUE)
+forecast(fity,h=02,xreg=forecast(fitx,h=2)$mean)
 
 reg.arma.pred <-as.data.frame(c(1062803, 1157508))
 names(reg.arma.pred)[1] <- "Reg w/ ARMA Pred"
@@ -371,7 +371,7 @@ sarima.pred <- as.data.frame(as.numeric(exp(sarima.for(log(pax),2,1,1,3,1,1,1,12
 names(sarima.pred)[1] <- "SARIMA Prediction"
 sarima.pred$month <- c(9,10)
 
-reg.arma.pred <-as.data.frame(c(1062803, 1157508))
+reg.arma.pred <-as.data.frame(c(1141519, 1208330))
 names(reg.arma.pred)[1] <- "Reg w/ ARMA Pred"
 reg.arma.pred$month <- c(9,10)
 
