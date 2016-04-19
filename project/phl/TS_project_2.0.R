@@ -157,7 +157,8 @@ socio <- left_join(emp, earnings, by = c("year", "month"))
 phl <- left_join(phl, socio, by = c("year", "month"))
 phl$year <- as.factor(phl$year)
 phl <- phl %>% select(date, year, month, pax, emp, earnings)
-#save(phl, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/phl.rda") 
+#save(phl, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/phl.rda")
+write.csv(phl, file = "~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.csv")
 
 #exploring ----
 
@@ -285,9 +286,14 @@ sarima(resids,1,1,0,0,1,1,12,details = FALSE)
 #Regression w arma erorrs (https://www.otexts.org/fpp/9/1)
 #september monthly earnings = 958.42*4=3833.68
 #october monthly earnings = 958.04*4=3832.16
+pax <- ts(phl$pax, frequency = 12)
+earnings <- ts(phl$earnings, frequency = 12)
+earnings <- phl$earnings - mean(phl$earnings)
+earnings2 <- earnings^2
+
 regressors <- cbind(earnings, earnings2)
 
-fit <- Arima(log(pax), order=c(1,1,0), seasonal = c(0,1,1), xreg=regressors)
+(fit <- Arima(log(pax), xreg=earnings, order=c(1,1,0), seasonal = c(0,1,1)))
 
 (forecast <- forecast.Arima(fit, xreg = c(3833.68, 3832.16)))
 
@@ -367,7 +373,7 @@ lines(xmat[,2],pred,lty=2) #Without is the dashed curve
 plot(pred2$pred)
 
 #comparing predicted to actual ----
-sarima.pred <- as.data.frame(as.numeric(exp(sarima.for(log(pax),2,1,1,3,1,1,1,12)$pred))) # do i need to exponentiate??
+sarima.pred <- as.data.frame(as.numeric(exp(sarima.for(log(pax),2,1,1,3,1,1,1,12)$pred)))
 names(sarima.pred)[1] <- "SARIMA Prediction"
 sarima.pred$month <- c(9,10)
 
