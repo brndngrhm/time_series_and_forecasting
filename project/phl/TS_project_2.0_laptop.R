@@ -265,10 +265,10 @@ summary(lm)
 #trying variable selection techniques
 step(lm, direction = "forward")
 step(lm, direction = "backward")
-step(lm, direction = "both")
+step(lm2, direction = "both")
 
 #second regression model based on variable selection techniques
-lm2 <-  lm(log(pax) ~ earnings + earnings2, data = pax2)
+lm2 <-  lm(log(pax[2:104]) ~ earnings[1:103] + earnings2[1:103] + emp2[1:103])
 summary(lm2)
 
 #saving residuals, plotting, shows evidnce of seasonality
@@ -290,12 +290,12 @@ uplim <- 4
 aicmat.resids2 <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
 for (i in 0:uplim){
   for (j in 0:uplim){
-    aicmat.resids2[i+1,j+1]<-sarima(resids,i,1,j,0,1,1,12,details=F,tol=0.001)$AIC}}
+    aicmat.resids2[i+1,j+1]<-sarima(resids,i,1,j,1,1,1,12,details=F,tol=0.001)$AIC}}
 
 print(aicmat.resids2)
 
 #SARIMA residual model
-sarima(resids,1,1,0,0,1,1,12,details = FALSE)
+sarima(resids,1,1,1,1,1,1,12,details = FALSE)
 
 #Regression w arma erorrs (https://www.otexts.org/fpp/9/1)
 #september monthly earnings = 958.42*4=3833.68
@@ -303,8 +303,9 @@ sarima(resids,1,1,0,0,1,1,12,details = FALSE)
 
 forecast.earnings <- as.data.frame(c(3833.68+14697102, 3832.16+14685450)) #IS THIS RIGHT??
 forecast.earnings$month <- c(9,10)
+regressors <- as.data.frame(cbind(earnings[1:103], earnings2[1:103]))
 
-(fit <- Arima(log(pax), xreg=pax2[,6:7], order=c(1,1,0), seasonal = c(0,1,1)))
+(fit <- Arima(log(pax)[2:104], xreg=regressors, order=c(1,1,1), seasonal = c(1,1,1)))
 
 (forecast <- forecast.Arima(fit, h=1, xreg = forecast.earnings))
 
@@ -440,3 +441,10 @@ emp.ccf <- ccf(dl12.pax, dl12.emp) #14 months
 out <- lm(pax[14:104]~emp[1:91])
 
 summary(out)
+
+
+#think abt adding fuel prices, ticket prices as regressors - http://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=pet&s=eer_epjk_pf4_rgc_dpg&f=m
+#sartima ARCH/GARCH behavior doesnt show too much
+#lagged variable does show too much
+#regression w arma erros should use lagged variables
+#for plotting use base plots with points and lines arguments to show actual and forecast
