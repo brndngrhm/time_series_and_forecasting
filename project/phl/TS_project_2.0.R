@@ -221,6 +221,16 @@ for (i in 0:uplim){
 
 (model <- sarima(log(pax), 2, 1, 3, 0, 1, 1, 12, detail = FALSE))
 
+acf2(resid(model$fit)^2) #pulling out and plotting squared residuals
+
+#CAN I USE AN ARCH-GARCH MODEL FOR FORECASTING?
+(fit1 <- garchFit(~arma(1,1) + garch(1,0), dl12.pax, trace = F)) #fitting a GARCH model
+sr <- fit1@residuals/fit1@sigma.t
+plot(sr,type='l') #seem like white noise
+acf2(sr) # a few significant lags
+acf2(sr^2) #doesn't seem to show signs of ARCH
+
+
 #SARIMA forecast
 sarima.for(log(pax), 2, 2, 1, 3, 0, 1, 1, 12)
 
@@ -411,10 +421,16 @@ acf2(sr^2) #doesn't seem to show signs of ARCH
 
 #lagged variable regression ----
 
-pax <- ts(phl$pax, frequency = 12)
-emp <- ts(phl$emp, frequency = 12)
-earnings <- ts(phl$earnings, frequency = 12)
+#DO I LOOK AT CCF PLOTS OF NORMAL VARIABLES OR DIFFERENCED?
+
+pax.ccf <- ts(phl$pax, frequency = 12)
+emp.ccf <- ts(phl$emp, frequency = 12)
+earnings.ccf <- ts(phl$earnings, frequency = 12)
 
 #cross correllation plots
 earnings.ccf <- ccf(dl12.pax, dl12.earnings) #6 month, 10 months
 emp.ccf <- ccf(dl12.pax, dl12.emp) #14 months
+
+out <- lm(pax[14:104]~emp[1:91])
+
+summary(out)
