@@ -241,8 +241,8 @@ time2 <- time^2
 emp <- ts(phl$emp, frequency = 12)
 emp <- phl$emp - mean(phl$emp)
 emp2 <- emp^2
-earnings <- ts(phl$earnings, frequency = 12)
-earnings <- phl$earnings - mean(phl$earnings)
+earnings <- phl$earnings/1000
+earnings <- earnings - mean(earnings)
 earnings2 <- earnings^2
 pax2 <- data.frame(cbind(pax, time, time2, emp, emp2, earnings, earnings2))
 
@@ -286,23 +286,15 @@ sarima(resids,1,1,0,0,1,1,12,details = FALSE)
 #Regression w arma erorrs (https://www.otexts.org/fpp/9/1)
 #september monthly earnings = 958.42*4=3833.68
 #october monthly earnings = 958.04*4=3832.16
-pax <- ts(phl$pax, frequency = 12)
-earnings <- ts(phl$earnings, frequency = 12)
-earnings <- phl$earnings - mean(phl$earnings)
-earnings2 <- earnings^2
 
-regressors <- cbind(earnings, earnings2)
+forecast.earnings <- as.data.frame(c(3833.68+14697102, 3832.16+14685450))
+forecast.earnings$month <- c(9,10)
 
-(fit <- Arima(log(pax), xreg=earnings, order=c(1,1,0), seasonal = c(0,1,1)))
+(fit <- Arima(log(pax), xreg=pax2[,6:7], order=c(1,1,0), seasonal = c(0,1,1)))
 
-(forecast <- forecast.Arima(fit, xreg = c(3833.68, 3832.16)))
+(forecast <- forecast.Arima(fit, h=1, xreg = forecast.earnings))
 
-#http://stats.stackexchange.com/questions/34493/time-series-modeling-with-dynamic-regressors-in-sas-vs-in-r
-fity <- auto.arima(log(pax), max.p=4, max.q=4, max.P=4, max.Q=4, stationary = TRUE, stepwise = TRUE, xreg=x, approximation = TRUE)
-fitx <- auto.arima(x, max.p=4, max.q=4, max.P=4, max.Q=4, stationary = TRUE, stepwise = TRUE)
-forecast(fity,h=02,xreg=forecast(fitx,h=2)$mean)
-
-reg.arma.pred <-as.data.frame(c(1062803, 1157508))
+reg.arma.pred <-as.data.frame(c(1127622, 1127622))
 names(reg.arma.pred)[1] <- "Reg w/ ARMA Pred"
 reg.arma.pred$month <- c(9,10)
 
@@ -377,7 +369,7 @@ sarima.pred <- as.data.frame(as.numeric(exp(sarima.for(log(pax),2,1,1,3,1,1,1,12
 names(sarima.pred)[1] <- "SARIMA Prediction"
 sarima.pred$month <- c(9,10)
 
-reg.arma.pred <-as.data.frame(c(1141519, 1208330))
+reg.arma.pred <-as.data.frame(c(1127622, 1127622))
 names(reg.arma.pred)[1] <- "Reg w/ ARMA Pred"
 reg.arma.pred$month <- c(9,10)
 
@@ -396,11 +388,12 @@ names(phl.new)[1] <- "month"
 pred.table <- left_join(sarima.pred, reg.arma.pred, by = "month")
 pred.table <- left_join(pred.table, decomp.pred, by = "month")
 pred.table <- left_join(pred.table, phl.new, by = "month")
+pred.table$month <- as.factor(pred.table$month)
 
 pred.table.melt<- melt(data.frame(pred.table), id = "month", measure.vars = )
 
 (pred.plot <- ggplot(pred.table.melt, aes(x=month, y=value, color = variable)) + 
-  geom_point() + geom_smooth(method="lm", se = FALSE) + theme_fivethirtyeight() + 
+  geom_point(aes(size=5)) +
   labs(x="\nMonth", y="Passngers\n", title = "Actual and Predicted Passengers\n"))
 
 #ARCH/GARCH ----
