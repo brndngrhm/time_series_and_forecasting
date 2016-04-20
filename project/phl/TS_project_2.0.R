@@ -88,7 +88,7 @@ data.2015$year <- "2015"
 
 pax <- rbind(data.2007, data.2008, data.2009, data.2010, data.2011, data.2012, data.2013, data.2014, data.2015)
 names(pax) <- tolower(names(pax))
-phl <- pax %>% filter(origin == "PHL") %>% group_by(year, month) %>% summarise("pax" = sum(passengers))
+phl <- pax %>% dplyr::filter(origin == "PHL") %>% group_by(year, month) %>% summarise("pax" = sum(passengers))
 phl$month2 <- month(phl$month, label = TRUE)
 phl$month <- NULL
 names(phl)[3] <- "month"
@@ -210,14 +210,16 @@ uplim=4
 aicmat.pax <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
 for (i in 0:uplim){
   for (j in 0:uplim){
-    aicmat.pax[i+1,j+1]=sarima(log(pax),0,1,0,i,1,j,12,details=F,tol=0.001)$AIC
-    print(aicmat.pax)}}
+    aicmat.pax[i+1,j+1]=sarima(log(pax),0,1,0,i,1,j,12,details=F,tol=0.001)$AIC}}
+
+print(aicmat.pax)
 
 aicmat.pax2 <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
 for (i in 0:uplim){
   for (j in 0:uplim){
-    aicmat.pax2[i+1,j+1]<-sarima(log(pax), i, 1, j, 0, 1, 2, 12, details=F, tol=0.001)$AIC
-    print(aicmat.pax2)}}
+    aicmat.pax2[i+1,j+1]<-sarima(log(pax), i, 1, j, 0, 1, 2, 12, details=F, tol=0.001)$AIC}}
+
+print(aicmat.pax2)
 
 (model <- sarima(log(pax), 2, 1, 3, 0, 1, 1, 12, detail = FALSE))
 
@@ -279,16 +281,18 @@ uplim <- 4
 aicmat.resids <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
 for (i in 0:uplim){
   for (j in 0:uplim){
-    aicmat.resids[i+1,j+1]=sarima(resids,0,1,0,i,1,j,12,details=F,tol=0.001)$AIC
-    print(aicmat.resids)}}
+    aicmat.resids[i+1,j+1]=sarima(resids,0,1,0,i,1,j,12,details=F,tol=0.001)$AIC}}
+
+print(aicmat.resids)
 
 #Trying to fit the other part. !!stops working halfway throuh for some reason??
 uplim <- 4
 aicmat.resids2 <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
 for (i in 0:uplim){
   for (j in 0:uplim){
-    aicmat.resids2[i+1,j+1]<-sarima(resids,i,1,j,0,1,1,12,details=F,tol=0.001)$AIC
-    print(aicmat.resids2)}}
+    aicmat.resids2[i+1,j+1]<-sarima(resids,i,1,j,0,1,1,12,details=F,tol=0.001)$AIC}}
+
+print(aicmat.resids2)
 
 #SARIMA residual model
 sarima(resids,1,1,0,0,1,1,12,details = FALSE)
@@ -387,7 +391,9 @@ decomp.pred <- as.data.frame(c(965740.1, 1169363))
 names(decomp.pred)[1] <- "Classical Decomposition Prediction"
 decomp.pred$month <- c(9,10)
 
-phl.new <- read.csv("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl_new.csv")
+#phl.new <- read.csv("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl_new.csv")
+phl.new <- read.csv("C:/Users/GRA/Documents/Brendan Graham/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl_new_laptop.csv")
+
 names(phl.new) <- tolower(names(phl.new))
 phl.new$month <- as.numeric(phl.new$month)
 phl.new$origin <- as.character(phl.new$origin)
