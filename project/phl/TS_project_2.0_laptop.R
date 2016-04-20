@@ -301,7 +301,7 @@ sarima(resids,1,1,0,0,1,1,12,details = FALSE)
 #september monthly earnings = 958.42*4=3833.68
 #october monthly earnings = 958.04*4=3832.16
 
-forecast.earnings <- as.data.frame(c(3833.68+14697102, 3832.16+14685450))
+forecast.earnings <- as.data.frame(c(3833.68+14697102, 3832.16+14685450)) #IS THIS RIGHT??
 forecast.earnings$month <- c(9,10)
 
 (fit <- Arima(log(pax), xreg=pax2[,6:7], order=c(1,1,0), seasonal = c(0,1,1)))
@@ -312,7 +312,7 @@ reg.arma.pred <-as.data.frame(c(1127622, 1127622))
 names(reg.arma.pred)[1] <- "Reg w/ ARMA Pred"
 reg.arma.pred$month <- c(9,10)
 
-#classical decompisition ----
+#classical decomposition ----
 pax2 <- log(pax[1:96])
 t=seq(2007,2014.917,by=1/12)
 t2 <- t^2
