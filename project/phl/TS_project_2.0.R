@@ -432,5 +432,4 @@ earnings.ccf <- ccf(dl12.pax, dl12.earnings) #6 month, 10 months
 emp.ccf <- ccf(dl12.pax, dl12.emp) #14 months
 
 out <- lm(pax[14:104]~emp[1:91])
-
 summary(out)
