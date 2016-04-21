@@ -16,6 +16,7 @@ price <- phl$price - mean(phl$price)
 price2 <- price^2
 time <- 1:104
 time2 <- time^2
+emp <- phl$emp/1000
 emp <- phl$emp - mean(phl$emp)
 emp2 <- emp^2
 earnings <- phl$earnings/1000
@@ -33,7 +34,7 @@ step(lm, direction = "backward")
 step(lm, direction = "both")
 
 #second regression model based on variable selection techniques
-lm2 <-  lm(log(avg.pax[2:104]) ~ time2[1:103] + price[1:103] + earnings[1:103] + earnings2[1:103])
+lm2 <-  lm(log(pax[2:104]) ~ pax[1:103] + time2[1:103] + price[1:103] + earnings[1:103] + earnings2[1:103])
 summary(lm2)
 
 #saving residuals, plotting, shows evidnce of seasonality
@@ -50,7 +51,7 @@ for (i in 0:uplim){
 
 print(aicmat.resids)
 
-#Trying to fit the other part. !!stops working halfway throuh for some reason??
+#Trying to fit the other part.
 uplim <- 4
 aicmat.resids2 <- matrix(double((uplim+1)^2),uplim+1,uplim+1)
 for (i in 0:uplim){
@@ -60,18 +61,34 @@ for (i in 0:uplim){
 print(aicmat.resids2)
 
 #SARIMA residual model
-sarima(resids,0,1,1,0,1,2,12,details = FALSE)
+sarima(resids,3,1,2,0,1,2,12,details = FALSE)
 
 #Regression w arma erorrs (https://www.otexts.org/fpp/9/1)
 #september monthly earnings = 958.42*4=3833.68
 #october monthly earnings = 958.04*4=3832.16
 
-regressors <- as.data.frame(cbind(price[1:103], earnings[1:103], earnings2[1:103]))
+regressors <- as.data.frame(cbind(pax[1:103], price[1:103], earnings[1:103]))
+forecast.vars <- data.frame(vars= c(1.395,1.389,3859.32,3833.68))
 
-(fit <- Arima(log(avg.pax)[2:104], xreg=regressors, order=c(0,1,1), seasonal = c(0,1,2)))
+(fit <- Arima(log(pax)[2:104], xreg=regressors, order=c(1,1,3), seasonal = c(0,1,2)))
 
-(forecast <- forecast.Arima(fit, h=1, xreg = forecast.earnings))
+(fit <- sarima(log(avg.pax)[2:104],1,1,2,0,1,2,12, xreg=regressors, details = F))
 
-reg.arma.pred <-as.data.frame(c(1127622, 1127622))
-names(reg.arma.pred)[1] <- "Reg w/ ARMA Pred"
-reg.arma.pred$month <- c(9,10)
+reg.fit <- fitted(sarima(log(avg.pax)[2:104], 1,1,2,0,1,2,12, xreg=regressors, details = F))
+
+(forecast <- forecast(fit, h=2, xreg = forecast.vars$vars, details = F))
+
+time <- seq(2, 104)
+forecast.time <- seq(103, 106)
+forecast.points <- c(14.0242, 13.83949, 13.92725)
+actual.points <- c(14.0242, 13.89314, 13.97053)
+
+plot(time, log(pax), type = "p", xlim=c(0, 106))
+lines(time[1:103], reg.fit, col="red", type ="l")
+points(105,13.83949, col="blue", pch=24)
+points(106, 13.92725, col="blue", pch=24)
+lines(forecast.time, forecast.points, type="l", col="blue")
+points(105, 13.89314, col="green")
+points(106, 13.97053, col="green")
+lines(forecast.time, actual.points, type="l", col="green")
+
