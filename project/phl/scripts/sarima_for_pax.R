@@ -46,5 +46,3 @@ lines(forecast.time, forecast.points, type="l", col="blue")
 points(105, 13.89314, col="green")
 points(106, 13.97053, col="green")
 lines(forecast.time, actual.points, type="l", col="green")
-
-
