@@ -21,11 +21,21 @@ library(fGarch)
 #UNIVARIATE EXPLORATION
 #format pax, emp and earnings as monthly time series w/frequency 12
 pax <- ts(phl$pax, frequency = 12)
+avg.pax <- ts(phl$avg.pax, frequency = 12)
 emp <- ts(phl$emp, frequency = 12)
 earnings <- ts(phl$earnings, frequency = 12)
+price <- ts(phl$price, frequency = 12)
 
 #time series plots of each variable, all show evidence of non stationarity (trend, heterskedasticity, seasonality)
 (pax.plot <- ggplot(phl, aes(x=date, y=pax)) + 
+  geom_point() + geom_line() + geom_smooth(se = F) + 
+  labs(title = "Passengers\n"))
+
+(avg.pax.plot <- ggplot(phl, aes(x=date, y=avg.pax)) + 
+  geom_point() + geom_line() + geom_smooth(se = F) + 
+  labs(title = "Avg Daily Passengers\n"))
+
+(fuel.plot <- ggplot(phl, aes(x=date, y=price)) + 
   geom_point() + geom_line() + geom_smooth(se = F) + 
   labs(title = "Passengers\n"))
 
@@ -49,24 +59,40 @@ plot(dl12.pax, type = "o")
 acf2(dl12.pax, max.lag = 80)
 
 
-
 #BIVARIATE EXPLORATION
 
 #scatterplot matrix
-scatterplotMatrix(~ pax + earnings + emp, data = phl)
+scatterplotMatrix(~ avg.pax + price + earnings + emp, data = phl)
 
 #looking at scatterplots of variables vs each other
-(pax <- ggplot(phl, aes(x=date, y=pax)) + geom_point() + geom_line() +  geom_smooth(se = F))
+(pax.scatter <- ggplot(phl, aes(x=date, y=pax)) + geom_point() + geom_line() +  geom_smooth(se = F))
 (pax.emp <- ggplot(phl, aes(x=emp, y=pax)) + geom_point() + geom_smooth(se = F))
 (pax.earnings <- ggplot(phl, aes(x=earnings, y=pax)) + geom_point() + geom_smooth(se = F))
+(pax.price <- ggplot(phl, aes(x=price, y=pax)) + geom_point() + geom_smooth(se = F))
 
-#CCF plot
-pax.ccf <- ts(phl$pax, frequency = 12)
-emp.ccf <- ts(phl$emp, frequency = 12)
-earnings.ccf <- ts(phl$earnings, frequency = 12)
+#CCF plots, need to make white noise first
+acf2(pax, max.lag = 80)
+acf2(avg.pax, max.lag = 80)
+acf2(price, max.lag = 80)
+acf2(earnings, max.lag = 80)
+acf2(emp, max.lag = 80)
 
-#cross correllation plots
-earnings.ccf <- ccf(dl12.pax, dl12.earnings) #6 month, 10 months
-emp.ccf <- ccf(dl12.pax, dl12.emp) #14 months
+dl.avg.pax <- diff(log(avg.pax), 1)
+dl12.avg.pax <- diff(dl.avg.pax, 12)
+acf2(dl12.avg.pax, max.lag = 80)
+
+dl.price <- diff(log(price), 1)
+acf2(dl.price, max.lag = 80)
+
+d.earnings <- diff((earnings))
+acf2(d.earnings, max.lag = 80)
+
+d.emp <- diff(emp)
+d12.emp <- diff(d.emp, 12)
+
+#cross correllation plots, doesnt show a lot of promise
+earnings.ccf <- ccf(dl12.pax, d.earnings) #6 month, 10 months
+emp.ccf <- ccf(dl12.pax, d12.emp) #14 months
+price.ccf<- ccf(dl12.pax, dl.price) #6 month, 10 months
 
 
