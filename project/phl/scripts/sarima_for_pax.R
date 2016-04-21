@@ -38,6 +38,7 @@ time <- seq(1, 104)
 forecast.time <- seq(104, 106)
 forecast.points <- c(14.0242, 13.83949, 13.92725)
 actual.points <- c(14.0242, 13.89314, 13.97053)
+
 plot(time, log(pax), type = "p", xlim=c(0, 106))
 lines(time, fit, col="red", type ="l")
 points(105,13.83949, col="blue", pch=24)
