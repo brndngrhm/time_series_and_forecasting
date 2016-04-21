@@ -23,31 +23,22 @@ library(fGarch)
 
 x.2007 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2007.csv")
 data.2007 <- read.csv(text = x.2007)
-
 x.2008 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2008.csv")
 data.2008 <- read.csv(text = x.2008)
-
 x.2009 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2009.csv")
 data.2009 <- read.csv(text = x.2009)
-
 x.2010 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2010.csv")
 data.2010 <- read.csv(text = x.2010)
-
 x.2011 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2011.csv")
 data.2011 <- read.csv(text = x.2011)
-
 x.2012 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2012.csv")
 data.2012 <- read.csv(text = x.2012)
-
 x.2013 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2013.csv")
 data.2013 <- read.csv(text = x.2013)
-
 x.2014 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2014.csv")
 data.2014 <- read.csv(text = x.2014)
-
 x.2015 <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/2015.csv")
 data.2015 <- read.csv(text = x.2015)
-
 
 #data.2007 <- read.csv("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/2007.csv")
 #data.2008 <- read.csv("~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/2008.csv")
@@ -61,28 +52,20 @@ data.2015 <- read.csv(text = x.2015)
 
 data.2007[5] <- NULL
 data.2007$year <- "2007"
-
 data.2008[5] <- NULL
 data.2008$year <- "2008"
-
 data.2009[5] <- NULL
 data.2009$year <- "2009"
-
 data.2010[5] <- NULL
 data.2010$year <- "2010"
-
 data.2011[5] <- NULL
 data.2011$year <- "2011"
-
 data.2012[5] <- NULL
 data.2012$year <- "2012"
-
 data.2013[5] <- NULL
 data.2013$year <- "2013"
-
 data.2014[5] <- NULL
 data.2014$year <- "2014"
-
 data.2015[5] <- NULL
 data.2015$year <- "2015"
 
@@ -153,17 +136,30 @@ earnings <- earnings %>% group_by(year, month) %>% summarise("earnings" = sum(ea
 earnings <- earnings[-c(105, 106, 107, 108), ]
 
 #jet fuel SOURCE: U.S. Gulf Coast Kerosene-Type Jet Fuel Spot Price FOB Dollars per Gallon
-
-
-
-#fares SOURCE: Bureau of Transportation Statistics
-
-
+x.fuel <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/fuel.csv")
+fuel <- read.csv(text = x.fuel)
+fuel$date <- mdy(fuel$date)
+fuel <- fuel %>% filter(date > "2006-12-31") %>% filter(date < "2015-08-01")
+fuel$year <- year(fuel$date)
+fuel$month <- month(fuel$date, label=T)
+fuel$year <- as.character(fuel$year)
+fuel$date <- NULL
 
 #join data and save .rda
 socio <- left_join(emp, earnings, by = c("year", "month"))
+phl <- left_join(phl,fuel, by = c("year", "month"))
 phl <- left_join(phl, socio, by = c("year", "month"))
 phl$year <- as.factor(phl$year)
-phl <- phl %>% select(date, year, month, pax, emp, earnings)
-#save(phl, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/phl.rda")
-write.csv(phl, file = "~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.csv")
+phl <- phl %>% select(date, year, month, pax, price, emp, earnings)
+
+#adding in days per month to derive avg daily pax
+days <- data.frame(c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+days$days <- c(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+names(days)[1] <- "month"
+phl <- left_join(phl,days, by = "month")
+phl$month <- month(phl$date, label=T)
+phl$avg.pax <- phl$pax/phl$days
+phl <- phl %>% select(date, year, month, pax, avg.pax, price, emp, earnings)
+
+save(phl, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/phl.rda")
+#write.csv(phl, file = "~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.csv")
