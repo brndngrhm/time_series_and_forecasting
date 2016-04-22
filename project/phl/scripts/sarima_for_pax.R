@@ -25,7 +25,6 @@ acf2(resid(model$fit)^2) #pulling out and plotting squared residuals
 sarima.for(log(pax), 2, 2, 1, 3, 0, 1, 1, 12) #next 2 months forecast are 13.83949 and 13.92725
 
 
-
 #getting actual phl pax for new months
 x.phl.new <- getURL("https://raw.githubusercontent.com/brndngrhm/time_series_and_forecasting/master/project/phl/data/phl_new.csv")
 phl.new <- read.csv(text = x.phl.new)
@@ -91,4 +90,16 @@ lines(forecast.time, decomp.pred, type="l", col="darkgreen", lwd=2)
 points(105, 13.80375, col="mediumpurple3", pch=24)
 points(106, 13.76140, col="mediumpurple3", pch=24)
 lines(forecast.time, reg.pred, type="l", col="mediumpurple3", lwd=2)
+
+#comparing all fits vs actual
+
+comparison <- data.frame(cbind(actual.pax, sarima.pred, decomp.pred, reg.pred))
+comparison <- comparison[2:3,]
+comparison$month <- c("September", "October")
+
+comp.melt<- melt((comparison), id = "month")
+
+(pred.plot <- ggplot(comp.melt, aes(x=variable, y=exp(value), color = variable)) + 
+  geom_point(aes(size=5)) + facet_grid(.~variable) +
+  labs(x="\nMonth", y="Passngers\n", title = "Actual and Predicted Passengers\n"))
 
