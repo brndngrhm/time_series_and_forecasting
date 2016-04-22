@@ -28,23 +28,23 @@ price <- ts(phl$price, frequency = 12)
 
 #time series plots of each variable, all show evidence of non stationarity (trend, heterskedasticity, seasonality)
 (pax.plot <- ggplot(phl, aes(x=date, y=pax)) + 
-  geom_point() + geom_line() + geom_smooth(se = F) + 
+  geom_point() + geom_line() + 
   labs(title = "Passengers\n"))
 
 (avg.pax.plot <- ggplot(phl, aes(x=date, y=avg.pax)) + 
-  geom_point() + geom_line() + geom_smooth(se = F) + 
+  geom_point() + geom_line() + 
   labs(title = "Avg Daily Passengers\n"))
 
 (fuel.plot <- ggplot(phl, aes(x=date, y=price)) + 
-  geom_point() + geom_line() + geom_smooth(se = F) + 
-  labs(title = "Passengers\n"))
+  geom_point() + geom_line() + 
+  labs(title = "Fuel\n"))
 
 (emp.plot <- ggplot(phl, aes(x=date, y=emp)) + 
-  geom_point() + geom_line()+ geom_smooth(se = F) + 
+  geom_point() + geom_line() +
   labs(title = "Employment\n"))
 
 (earnings.plot <- ggplot(phl, aes(x=date, y=earnings)) + 
-  geom_point() + geom_line() + geom_smooth(se = F) + 
+  geom_point() + geom_line() + 
   labs(title = "Earnings\n"))
 
 #ACF plots of pax
