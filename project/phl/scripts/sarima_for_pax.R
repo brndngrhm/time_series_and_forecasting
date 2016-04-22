@@ -52,7 +52,7 @@ actual.pax <- c(14.0242, 13.89314, 13.97053)
 
 #various predicted values from models
 sarima.pred <- c(14.0242, 13.83949, 13.92725)
-decomp.pred <- c(14.0242, 13.92797, 13.83861)
+decomp.pred <- c(14.0242, 13.97036, 13.93802)
 
 #plot
 plot(time, log(pax), type = "p", xlim=c(80, 108))
@@ -70,12 +70,12 @@ points(106, 13.97053, col="deepskyblue2")
 lines(forecast.time, actual.pax, type="l", col="deepskyblue2", lwd=2)
 
 #SARIMA predictions
-points(105,13.83949, col="green3", pch=24)
-points(106, 13.92725, col="green3", pch=24)
-lines(forecast.time, sarima.pred, type="l", col="green3", lwd=2)
+points(105,13.83949, col="red", pch=24)
+points(106, 13.92725, col="red", pch=24)
+lines(forecast.time, sarima.pred, type="l", col="red", lwd=2)
 
 #Decomp predictions
-points(105,13.92797, col="darkgreen", pch=24)
-points(106, 13.83861, col="darkgreen", pch=24)
+points(105,13.97036, col="darkgreen", pch=24)
+points(106, 13.93802, col="darkgreen", pch=24)
 lines(forecast.time, decomp.pred, type="l", col="darkgreen", lwd=2)
 
