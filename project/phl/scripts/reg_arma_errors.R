@@ -24,6 +24,7 @@ earnings <- earnings - mean(earnings)
 earnings2 <- earnings^2
 pax2 <- data.frame(cbind(avg.pax, time, time2, price, price2, emp, emp2, earnings, earnings2))
 
+
 #1st regression model using all variables, not a lot of significant variables
 lm <- lm(log(avg.pax) ~ ., data = pax2)
 summary(lm)
@@ -63,6 +64,20 @@ print(aicmat.resids2)
 #SARIMA residual model
 sarima(resids,3,1,2,0,1,2,12,details = FALSE)
 
+sarima.for(log(pax),2,3,1,2,0,1,2,12)
+
+regressors <- cbind(price[1:103], earnings[1:103], earnings2[1:103])
+future.price <- c(1.389, 1.395, 1.391)
+future.earnings <- c(3.85932, 3.83368, 3.83216)
+future.earnings2 <- future.earnings^2
+future.vals <- cbind(future.price, future.earnings, future.earnings2)
+future.vals.centered <- cbind((future.price - mean(future.price)), (future.earnings - mean(future.earnings)), (future.earnings2 - mean(future.earnings2)))
+
+fit <- Arima(log(pax)[2:104],order=c(3,1,2), seasonal = c(0,1,2), xreg=regressors)
+
+fcast <- forecast(fit, h=2, xreg=future.vals.centered)
+
+
 #Regression w arma erorrs (https://www.otexts.org/fpp/9/1)
 #september monthly earnings = 958.42*4=3833.68
 #october monthly earnings = 958.04*4=3832.16
@@ -77,18 +92,4 @@ forecast.vars <- data.frame(vars= c(1.395,1.389,3859.32,3833.68))
 reg.fit <- fitted(sarima(log(avg.pax)[2:104], 1,1,2,0,1,2,12, xreg=regressors, details = F))
 
 (forecast <- forecast(fit, h=2, xreg = forecast.vars$vars, details = F))
-
-time <- seq(2, 104)
-forecast.time <- seq(103, 106)
-forecast.points <- c(14.0242, 13.83949, 13.92725)
-actual.points <- c(14.0242, 13.89314, 13.97053)
-
-plot(time, log(pax), type = "p", xlim=c(0, 106))
-lines(time[1:103], reg.fit, col="red", type ="l")
-points(105,13.83949, col="blue", pch=24)
-points(106, 13.92725, col="blue", pch=24)
-lines(forecast.time, forecast.points, type="l", col="blue")
-points(105, 13.89314, col="green")
-points(106, 13.97053, col="green")
-lines(forecast.time, actual.points, type="l", col="green")
 
