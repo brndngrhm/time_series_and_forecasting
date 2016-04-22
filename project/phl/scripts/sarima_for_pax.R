@@ -53,6 +53,7 @@ actual.pax <- c(14.0242, 13.89314, 13.97053)
 #various predicted values from models
 sarima.pred <- c(14.0242, 13.83949, 13.92725)
 decomp.pred <- c(14.0242, 13.97036, 13.93802)
+reg.pred <- c(14.0242, 13.80375, 13.76140)
 
 #plot
 plot(time, log(pax), type = "p", xlim=c(80, 108))
@@ -78,4 +79,9 @@ lines(forecast.time, sarima.pred, type="l", col="red", lwd=2)
 points(105,13.97036, col="darkgreen", pch=24)
 points(106, 13.93802, col="darkgreen", pch=24)
 lines(forecast.time, decomp.pred, type="l", col="darkgreen", lwd=2)
+
+#Reg w/ arma errors predictions
+points(105,13.80375, col="mediumpurple3", pch=24)
+points(106, 13.76140, col="mediumpurple3", pch=24)
+lines(forecast.time, reg.pred, type="l", col="mediumpurple3", lwd=2)
 
