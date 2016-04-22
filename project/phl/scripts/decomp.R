@@ -7,7 +7,7 @@ plot(t,pax2,type='l')
 season=rep(1:12,8)
 out=lm(pax2~t+t2+factor(season))
 plot(out$residuals,type='l')
-acf2(out$residuals)
+acf2(out$residuals, max.lag = 50)
 
 dat=out$residuals
 
