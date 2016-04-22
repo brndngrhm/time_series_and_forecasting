@@ -77,6 +77,7 @@ fit <- Arima(log(pax)[2:104],order=c(3,1,2), seasonal = c(0,1,2), xreg=regressor
 
 fcast <- forecast(fit, h=2, xreg=future.vals.centered)
 
+reg.arma.fit <- fitted(fit)
 
 #Regression w arma erorrs (https://www.otexts.org/fpp/9/1)
 #september monthly earnings = 958.42*4=3833.68
