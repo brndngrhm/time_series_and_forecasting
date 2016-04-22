@@ -1,7 +1,7 @@
 #regression with ARMA Errors
 
 #scatterplot matrix
-scatterplotMatrix(~ avg.pax + price + earnings + emp, data = phl)
+scatterplotMatrix(~ pax + price + earnings + emp, data = phl)
 
 #looking at scatterplots of variables vs each other
 (pax.scatter <- ggplot(phl, aes(x=date, y=pax)) + geom_point() + geom_line() +  geom_smooth(se = F))
@@ -26,7 +26,7 @@ pax2 <- data.frame(cbind(avg.pax, time, time2, price, price2, emp, emp2, earning
 
 
 #1st regression model using all variables, not a lot of significant variables
-lm <- lm(log(avg.pax) ~ ., data = pax2)
+lm <- lm(log(pax) ~ ., data = pax2)
 summary(lm)
 
 #trying variable selection techniques
@@ -35,7 +35,7 @@ step(lm, direction = "backward")
 step(lm, direction = "both")
 
 #second regression model based on variable selection techniques
-lm2 <-  lm(log(pax[2:104]) ~ pax[1:103] + time2[1:103] + price[1:103] + earnings[1:103] + earnings2[1:103])
+lm2 <-  lm(log(pax[2:104]) ~ price[1:103] + earnings[1:103] + earnings2[1:103])
 summary(lm2)
 
 #saving residuals, plotting, shows evidnce of seasonality
