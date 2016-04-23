@@ -161,5 +161,5 @@ phl$month <- month(phl$date, label=T)
 phl$avg.pax <- phl$pax/phl$days
 phl <- phl %>% select(date, year, month, pax, avg.pax, price, emp, earnings)
 
-save(phl, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/phl.rda")
+#save(phl, file = "C:/Users/GRA/Desktop/Misc/R Working Directory/School/time_series_and_forecasting/project/phl/data/phl.rda")
 #write.csv(phl, file = "~/R Working Directory/Villanova/time_series_and_forecasting/project/phl/data/phl.csv")
