@@ -5,7 +5,7 @@ t=seq(2007, 2014.917,by=1/12)
 t2 <- t^2
 plot(t,pax2,type='l')
 season=rep(1:12,8)
-out=lm(pax2~t+t2+factor(season))
+out <- lm(pax2~t+t2+factor(season))
 plot(out$residuals,type='l')
 acf2(out$residuals, max.lag = 50)
 
