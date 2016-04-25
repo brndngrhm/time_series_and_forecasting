@@ -16,7 +16,7 @@ for (i in 0:uplim){
 
 print(aicmat.pax2)
 
-(model <- sarima(log(pax), 2, 1, 3, 0, 1, 1, 12, detail = FALSE))
+(model <- sarima(log(pax), 2, 1, 3, 0, 1, 1, 12))
 
 #checking ARCH/GARH behavior, seems ok
 acf2(resid(model$fit)^2) #pulling out and plotting squared residuals
@@ -102,4 +102,40 @@ comp.melt<- melt((comparison), id = "month")
 (pred.plot <- ggplot(comp.melt, aes(x=variable, y=exp(value), color = variable)) + 
   geom_point(aes(size=5)) + facet_grid(.~variable) +
   labs(x="\nMonth", y="Passngers\n", title = "Actual and Predicted Passengers\n"))
+
+#numerical differences
+
+#SARIMA
+#November
+exp(13.89314) - exp(13.83949)
+#october
+exp(13.97053) - exp(13.92725)
+
+#DEcomp
+#November
+exp(13.89314) - exp(13.97036)
+#october
+exp(13.97053) - exp(13.93802)
+
+#Reg.arma
+#November
+exp(13.89314) - exp(13.80375)
+#october
+exp(13.97053) - exp(13.76140)
+
+actual.pax <- c(14.0242, 13.89314, 13.97053)
+
+#various predicted values from models
+sarima.pred <- c(14.01201, 13.83949, 13.92725)
+decomp.pred <- c(14.0242, 13.97036, 13.93802)
+reg.pred <- c(13.95143, 13.80375, 13.76140)
+
+#plot showing actual points
+plot(time, log(pax), type = "o", xlim=c(0, 108))
+abline(v=time[104])
+#adding actual Pax
+points(105, 13.89314, col="deepskyblue2")
+points(106, 13.97053, col="deepskyblue2")
+lines(forecast.time, actual.pax, type="l", col="deepskyblue2", lwd=2)
+
 
