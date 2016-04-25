@@ -33,8 +33,7 @@ phl.new$month <- as.numeric(phl.new$month)
 phl.new$origin <- as.character(phl.new$origin)
 phl.new <- phl.new %>% dplyr::filter(origin == "PHL" & month > 8) %>% group_by(month) %>% summarise(pax = sum(passengers)) %>% ungroup()
 
-
-#getting fitted values and plotting with original points and adding forecast looks good
+#getting fitted values and plotting with original points and adding forecast:
 
 #sarima fit
 sarima.fit <- ts(fitted(arima(log(pax), order=c(2, 1, 3), seasonal = c(0, 1, 1))), frequency = 12)
