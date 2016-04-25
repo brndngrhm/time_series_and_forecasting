@@ -122,8 +122,6 @@ exp(13.89314) - exp(13.80375)
 #october
 exp(13.97053) - exp(13.76140)
 
-actual.pax <- c(14.0242, 13.89314, 13.97053)
-
 #various predicted values from models
 sarima.pred <- c(14.01201, 13.83949, 13.92725)
 decomp.pred <- c(14.0242, 13.97036, 13.93802)
